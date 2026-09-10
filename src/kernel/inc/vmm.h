@@ -6,10 +6,10 @@
 
 void vmmInit();
 
-void vmmMapPages(void* virt, u64 phys, u64 flags, int n);
+void vmmMapPages(void* virt, u64 phys, int flags, int n);
 void vmmUnmapPages(void* virt, int n);
 
-void vmmMap(void* virt, u64 phys, u64 flags);
+void vmmMap(void* virt, u64 phys, int flags);
 void vmmUnmap(void* virt);
 
 u64 vmmVirtToPhys(void* virt);

@@ -2,7 +2,9 @@
 #define PAGING_H
 
 #define PAGE_SIZE 0x1000  // 4096
-#define PAGE_ADDR_MASK 0x000ffffffffff000
+#define PAGE_ADDR_MASK \
+  0b11111111111111111111111111111111111111111111111111000000000000
+
 #define PTE_PRESENT 1           // 0000000000000000000000000000001
 #define PTE_WRITABLE 2          // 0000000000000000000000000000010
 #define PTE_USER 4              // 0000000000000000000000000000100
@@ -21,15 +23,10 @@
 #define P2(addr) (((u64)addr >> 21) & 0x1FF)
 #define P3(addr) (((u64)addr >> 30) & 0x1FF)
 #define P4(addr) (((u64)addr >> 39) & 0x1FF)
-#define ATTRIBUTE_SET(ent, attrib) (*ent |= attrib)
-#define FRAME_SET(ent, addr)                                                 \
-  (*ent =                                                                    \
-       (*ent &                                                               \
-        ~0b11111111111111111111111111111111111111111111111111000000000000) | \
-       addr)
 
-typedef struct {
-  u64 Ent[512];
-} __attribute__((packed)) PageTable;
+#define PTE(frame, flags) (frame & PAGE_ADDR_MASK) | (flags | PTE_PRESENT)
+
+typedef u64 PageEntry;
+typedef PageEntry* PageTable;
 
 #endif

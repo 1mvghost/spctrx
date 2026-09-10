@@ -1,7 +1,8 @@
 #include <pmm.h>
+#include <printf.h>
 #include <vmm.h>
 
-PageTable* p4;
+static PageTable p4;
 
 extern void vmmLoad(void* p4);
 
@@ -13,57 +14,49 @@ u64 vmmVirtToPhys(void* virt) {
   return ((u64)virt - 0xffff800000000000);
 }
 
-PageTable* vmmGetPageTable(u64 ent) {
-  return (PageTable*)vmmPhysToVirt(ent & PAGE_ADDR_MASK);
+void vmmInvalidatePage(void* virt) {
+  asm volatile("invlpg (%0)" ::"r"(virt) : "memory");
 }
 
-u64 vmmInitPTE(u64 frame, u64 flags) {
-  u64 ent = 0;
-
-  ATTRIBUTE_SET(&ent, PTE_PRESENT);
-  ATTRIBUTE_SET(&ent, flags);
-  FRAME_SET(&ent, frame);
-
-  return ent;
-}
-
-u64 vmmAllocPTE(u64 flags) {
-  return vmmInitPTE(pmmAlloc(1), flags);
-}
-
-PageTable* vmmWalk(void* virt, bool alloc, u64 allocFlags) {
-  if (p4->Ent[P4(virt)] == 0) {
-    if (!alloc)
-      return 0;
-    p4->Ent[P4(virt)] = vmmAllocPTE(allocFlags);
+PageTable vmmGetPageTable(u64 ent) {
+  if (ent == 0) {
+    return 0;
   }
-
-  PageTable* p3 = vmmGetPageTable(p4->Ent[P4(virt)]);
-
-  if (p3->Ent[P3(virt)] == 0) {
-    if (!alloc)
-      return 0;
-    p3->Ent[P3(virt)] = vmmAllocPTE(allocFlags);
-  }
-
-  PageTable* p2 = vmmGetPageTable(p3->Ent[P3(virt)]);
-
-  if (p2->Ent[P2(virt)] == 0) {
-    if (!alloc)
-      return 0;
-    p2->Ent[P2(virt)] = vmmAllocPTE(allocFlags);
-  }
-
-  return vmmGetPageTable(p2->Ent[P2(virt)]);
-}
-void vmmMap(void* virt, u64 phys, u64 flags) {
-  PageTable* p1 = vmmWalk(virt, true, flags);
-
-  p1->Ent[P1(virt)] = vmmInitPTE(phys, flags);
-  invlpg(&p1->Ent[P1(virt)]);
+  return (PageTable)vmmPhysToVirt(ent & PAGE_ADDR_MASK);
 }
 
-void vmmMapPages(void* virt, u64 phys, u64 flags, int n) {
+PageTable vmmWalk(void* virt, bool alloc, int allocFlags) {
+  int p4Idx = P4(virt);
+  int p3Idx = P3(virt);
+  int p2Idx = P2(virt);
+
+  if (alloc && p4[p4Idx] == 0) {
+    p4[p4Idx] = PTE(pmmAlloc(1), allocFlags);
+  }
+  PageTable p3 = vmmGetPageTable(p4[p4Idx]);
+
+  if (alloc && p3[p3Idx] == 0) {
+    p3[p3Idx] = PTE(pmmAlloc(1), allocFlags);
+  }
+  PageTable p2 = vmmGetPageTable(p3[p3Idx]);
+
+  if (alloc && p2[p2Idx] == 0) {
+    p2[p2Idx] = PTE(pmmAlloc(1), allocFlags);
+  }
+  PageTable p1 = vmmGetPageTable(p2[p2Idx]);
+
+  return p1;
+}
+
+void vmmMap(void* virt, u64 phys, int flags) {
+  PageTable p1 = vmmWalk(virt, true, flags);
+
+  p1[P1(virt)] = PTE(phys, flags);
+
+  vmmInvalidatePage(virt);
+}
+
+void vmmMapPages(void* virt, u64 phys, int flags, int n) {
   while (n--) {
     vmmMap(virt, phys, flags);
     virt += PAGE_SIZE, phys += PAGE_SIZE;
@@ -71,12 +64,13 @@ void vmmMapPages(void* virt, u64 phys, u64 flags, int n) {
 }
 
 void vmmUnmap(void* virt) {
-  PageTable* p1 = vmmWalk(virt, false, 0);
+  PageTable p1 = vmmWalk(virt, false, 0);
   if (p1 == 0)
     return;
 
-  p1->Ent[P1(virt)] = 0;
-  invlpg(&p1->Ent[P1(virt)]);
+  p1[P1(virt)] = 0;
+
+  vmmInvalidatePage(virt);
 }
 
 void vmmUnmapPages(void* virt, int n) {
@@ -96,7 +90,7 @@ void vmmInit() {
 
   u64 p4Phys = 0;
   asm("movq %%cr3, %0" : "=r"(p4Phys));
-  p4 = (PageTable*)vmmPhysToVirt(p4Phys);
+  p4 = (PageTable)vmmPhysToVirt(p4Phys);
 
   vmmLoad((void*)p4Phys);
 }

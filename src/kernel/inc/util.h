@@ -127,9 +127,6 @@ static inline int strlen(char* s) {
 static inline void cpuid(u32* a, u32* b, u32* c, u32* d) {
   asm volatile("cpuid" : "=b"(*b), "=c"(*c), "=d"(*d) : "a"(*a));
 }
-static inline void invlpg(void* addr) {
-  asm volatile("invlpg (%0)" ::"r"(addr) : "memory");
-}
 
 static inline int strcmp(const char* s1, const char* s2) {
   const char* ss1 = s1;
