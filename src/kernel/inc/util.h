@@ -1,11 +1,13 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef unsigned long long int u64;
-typedef unsigned long int size_t;
+#include <stddef.h>
+#include <stdint.h>
+
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
 
 #define U64_LOW(addr) (addr & 0xffffffff)
 #define U64_HIGH(addr) ((addr >> 32) & 0xffffffff)
@@ -52,18 +54,12 @@ static inline void ins32(u16 port, u32* buf, int q) {
   }
 }
 static inline void memset(void* dst, u8 value, int n) {
-  u8* d = dst;
-
-  while (n-- > 0) {
-    *d++ = value;
-  }
+  UNUSED(dst);
+  asm volatile("rep stosb" : : "a"(value), "c"(n));
 }
 static inline void* memcpy(void* dst, void* src, int n) {
-  u8* d = (u8*)dst;
-  u8* s = (u8*)src;
-  for (int i = 0; i < n; i++) {
-    d[i] = s[i];
-  }
+  UNUSED(src);
+  asm volatile("rep movsb" : : "c"(n));
   return dst;
 }
 static inline void* memmove(void* dstptr, const void* srcptr, u64 size) {
@@ -77,9 +73,6 @@ static inline void* memmove(void* dstptr, const void* srcptr, u64 size) {
       dst[i - 1] = src[i - 1];
   }
   return dstptr;
-}
-static inline void sti() {
-  __asm__ volatile("sti");
 }
 static inline u8 keypress() {
   /* doesnt work on uefi real hardware :( */
@@ -137,7 +130,10 @@ static inline int strcmp(const char* s1, const char* s2) {
   }
   return *(const unsigned char*)ss1 - *(const unsigned char*)ss2;
 }
-static inline void strcpy(char* dst, char* src) {
-  memcpy(dst, src, strlen(src));
+static inline char* strcpy(char* dst, char* src) {
+  char* tmp = dst;
+  while ((*dst++ = *src++))
+    ;
+  return tmp;
 }
 #endif
