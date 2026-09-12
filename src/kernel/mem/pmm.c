@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <boot.h>
 #include <debug.h>
 #include <panic.h>
@@ -5,23 +6,40 @@
 #include <vmm.h>
 
 static u64 here = 0;
+static u64 left = 0;
 
-static u64 used = 0;
-static u64 pages = 0;
-
-u64 pmmAlloc(u64 l) {
-  if (used >= pages) {
-    panic("OUT OF MEMORY\n");
-  }
-  used += l;
-  here += (PAGE_SIZE * l);
-
-  return here - (PAGE_SIZE * l);
+void pmmHandleOOM() {
+  panic("OUT OF MEMORY\n");
 }
 
-void pmmFree(u64 addr, u64 l) {
+u64 pmmAlloc(size_t pages) {
+  ASSERT(pages > 0);
+
+  if (pages > left) {
+    pmmHandleOOM();
+    return 0;
+  }
+
+  u64 result = here;
+
+  here += (PAGE_SIZE * pages);
+  left -= pages;
+
+  return result;
+}
+
+u64 pmmZeroAlloc(size_t pages) {
+  ASSERT(pages > 0);
+
+  u64 addr = pmmAlloc(pages);
+  memset(vmmPhysToVirt(addr), 0, pages * PAGE_SIZE);
+
+  return addr;
+}
+
+void pmmFree(u64 addr, size_t pages) {
   UNUSED(addr);
-  UNUSED(l);
+  UNUSED(pages);
 }
 
 void pmmInit() {
@@ -41,7 +59,7 @@ void pmmInit() {
   }
 
   here = selected->base;
-  pages = mx / PAGE_SIZE;
+  left = mx / PAGE_SIZE;
 
-  debug("pmm: start:%x pages:%d\n", here, pages);
+  debug("pmm: start:%x pages:%d\n", here, left);
 }

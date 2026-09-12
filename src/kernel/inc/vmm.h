@@ -15,6 +15,6 @@ void vmmUnmap(void* virt);
 u64 vmmVirtToPhys(void* virt);
 void* vmmPhysToVirt(u64 phys);
 
-void* vmmAlloc(u64 pages);
+void* vmmAlloc(size_t pages);
 
 #endif

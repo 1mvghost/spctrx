@@ -3,8 +3,9 @@
 
 #include <util.h>
 
-u64 pmmAlloc(u64 l);
-void pmmFree(u64 addr, u64 l);
+u64 pmmAlloc(size_t pages);
+u64 pmmZeroAlloc(size_t pages);
+void pmmFree(u64 addr, size_t pages);
 void pmmInit();
 
 #endif
