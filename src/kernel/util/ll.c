@@ -2,42 +2,34 @@
 #include <assert.h>
 #include <ll.h>
 
-void llInit(LinkedList* ll) {
-  ASSERT(ll != 0);
+void llInitHead(LLHead* head) {
+  ASSERT(head != 0);
 
-  ll->Head = 0;
-  ll->Tail = 0;
+  head->Prev = head;
+  head->Next = head;
 }
 
-void llAdd(LinkedList* ll, void* data) {
-  ASSERT(ll != 0);
+void llInsertFront(LLHead* head, LLHead* node) {
+  ASSERT(head != 0);
+  ASSERT(node != 0);
 
-  LLNode* tail = malloc(sizeof(LLNode));
+  LLHead* next = head->Next;
 
-  ASSERT(tail != 0);
-
-  tail->Next = 0;
-  tail->Data = data;
-
-  if (ll->Head == 0) {
-    ll->Head = tail;
-    ll->Tail = tail;
-  } else {
-    ll->Tail->Next = tail;
-    ll->Tail = ll->Tail->Next;
-  }
+  node->Next = next;
+  next->Prev = node;
+  head->Next = node;
+  node->Prev = head;
 }
 
-void llFree(LinkedList* ll) {
-  ASSERT(ll != 0);
+void llDelete(LLHead* node) {
+  ASSERT(node != 0);
 
-  LLNode* cur = ll->Head;
-  while (cur) {
-    LLNode* next = cur->Next;
-    free(cur);
-    cur = next;
-  }
+  node->Prev->Next = node->Next;
+  node->Next->Prev = node->Prev;
+}
 
-  ll->Head = 0;
-  ll->Tail = 0;
+bool llEmpty(LLHead* head) {
+  ASSERT(head != 0);
+
+  return head->Next == head;
 }

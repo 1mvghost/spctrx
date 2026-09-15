@@ -9,8 +9,8 @@
 #include <vfs.h>
 #include <vmm.h>
 
-LinkedList mntTable;
-struct FsNode* root;
+static LLHead mnts;
+static struct FsNode* root;
 
 struct FsNode* vfsAlloc(struct FsMnt* mnt, u8 type) {
   struct FsNode* n = malloc(sizeof(struct FsNode));
@@ -29,15 +29,12 @@ struct FsMnt* vfsFindMnt(struct FsNode* n) {
   if (!n)
     return 0;
 
-  LLNode* cur = mntTable.Head;
-
-  while (cur) {
-    struct FsMnt* curMnt = cur->Data;
-
-    if (curMnt->Mnt == n)
-      return curMnt;
-
-    cur = cur->Next;
+  LLHead* curr;
+  LL_TRAVERSE(curr, &mnts) {
+    struct FsMnt* mnt = LIST_ENTRY(curr, struct FsMnt, Head);
+    if (mnt->Mountpoint == n) {
+      return mnt;
+    }
   }
 
   return 0;
@@ -135,7 +132,9 @@ void vfsMount(char* path, char* dev, char* type) {
   strcpy(mnt->Dev, dev);
   strcpy(mnt->Path, path);
 
-  mnt->Mnt = l;
+  mnt->Mountpoint = l;
+
+  llInitHead(&mnt->Head);
 
   if (!strcmp(type, "dev")) {
     devInit(mnt);
@@ -144,7 +143,7 @@ void vfsMount(char* path, char* dev, char* type) {
     tmpInit(mnt);
   }
 
-  llAdd(&mntTable, mnt);
+  llInsertFront(&mnts, &mnt->Head);
 
   debug("vfs: MOUNTED %s\n", path);
 
@@ -152,7 +151,7 @@ void vfsMount(char* path, char* dev, char* type) {
 }
 
 void vfsInit() {
-  llInit(&mntTable);
+  llInitHead(&mnts);
 
   root = malloc(sizeof(struct FsNode));
 

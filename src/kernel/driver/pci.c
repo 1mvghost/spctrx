@@ -27,6 +27,8 @@ typedef struct {
   u32 Bar3;
   u32 Bar4;
   u32 Bar5;
+
+  LLHead Head;
 } PCIDevice;
 
 static char* class[32] = {"Unknown",
@@ -48,7 +50,7 @@ static char* class[32] = {"Unknown",
                           "Encryption Controller",
                           "Signal Processing Controller"};
 
-LinkedList pciDevices;
+static LLHead pciDevices;
 
 u32 pciIn32(u32 bus, u32 dev, u32 func, u32 offset) {
   u32 address;
@@ -125,9 +127,11 @@ void pciCheckDevice(u32 bus, u32 dev) {
     /* 0xFFFF - NONEXISTENT DEVICE */
     if (vendor != 0xFFFF) {
       PCIDevice* d = (PCIDevice*)malloc(sizeof(PCIDevice));
-      llAdd(&pciDevices, d);
+      llInitHead(&d->Head);
 
       pciReadData(bus, dev, f, d);
+
+      llInsertFront(&pciDevices, &d->Head);
 
       debug(
           "pci: FOUND PCI: %s(%d) VENDOR:%x BAR0:%x BAR1:%x BAR2:%x BAR3:%x "
@@ -147,6 +151,7 @@ void pciEnum() {
   }
 }
 void pciInit() {
-  llInit(&pciDevices);
+  llInitHead(&pciDevices);
+
   pciEnum();
 }

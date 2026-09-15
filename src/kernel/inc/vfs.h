@@ -1,5 +1,7 @@
 #ifndef VFS_H
 #define VFS_H
+
+#include <ll.h>
 #include <util.h>
 
 #define TYPE_DIR 1
@@ -18,9 +20,11 @@ struct FsMnt {
   char Path[64];
 
   /* make lookups less painful */
-  struct FsNode* Mnt;
+  struct FsNode* Mountpoint;
 
   struct FsNode* Root;
+
+  LLHead Head;
 };
 
 struct FsFd {
