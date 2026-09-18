@@ -1,10 +1,8 @@
-#include <alloc.h>
 #include <debug.h>
 #include <dev.h>
 #include <ll.h>
 #include <mem.h>
-#include <ops.h>
-#include <printf.h>
+#include <slab.h>
 #include <tmp.h>
 #include <vfs.h>
 #include <vmm.h>
@@ -12,16 +10,18 @@
 static LLHead mnts;
 static struct FsNode* root;
 
+static SlabCache nodeCache;
+
 struct FsNode* vfsAlloc(struct FsMnt* mnt, u8 type) {
-  struct FsNode* n = malloc(sizeof(struct FsNode));
-  memset(n, 0, sizeof(struct FsNode));
+  struct FsNode* n = slabAlloc(&nodeCache);
 
   n->Type = type;
   n->Mnt = mnt;
   n->Ops = 0;
 
-  if (mnt->Root)
+  if (mnt->Root) {
     n->Ops = mnt->Root->Ops;
+  }
 
   return n;
 }
@@ -104,8 +104,10 @@ struct FsNode* vfsLookup(char* path) {
   return cur;
 }
 
+static SlabCache fdCache;
+
 struct FsFd* vfsFdAlloc(struct FsNode* n, u64 flags) {
-  struct FsFd* fd = malloc(sizeof(struct FsFd));
+  struct FsFd* fd = slabAlloc(&fdCache);
   fd->Inode = n;
   fd->Pos = 0;
   fd->Mnt = n->Mnt;
@@ -114,6 +116,8 @@ struct FsFd* vfsFdAlloc(struct FsNode* n, u64 flags) {
 }
 
 Splock mntSplock = ATOMIC_FLAG_INIT;
+
+static SlabCache mntCache;
 
 void vfsMount(char* path, char* dev, char* type) {
   struct FsNode* l = vfsLookup(path);
@@ -125,14 +129,14 @@ void vfsMount(char* path, char* dev, char* type) {
 
   mSpinlockAcquire(&mntSplock);
 
-  struct FsMnt* mnt = malloc(sizeof(struct FsMnt));
-  memset(mnt, 0, sizeof(struct FsMnt));
+  struct FsMnt* mnt = slabAlloc(&mntCache);
 
   strcpy(mnt->Type, type);
   strcpy(mnt->Dev, dev);
   strcpy(mnt->Path, path);
 
   mnt->Mountpoint = l;
+  mnt->Root = 0;
 
   llInitHead(&mnt->Head);
 
@@ -151,9 +155,13 @@ void vfsMount(char* path, char* dev, char* type) {
 }
 
 void vfsInit() {
+  slabInitCache(&nodeCache, "vfs node cache", sizeof(struct FsNode));
+  slabInitCache(&fdCache, "vfs fd cache", sizeof(struct FsFd));
+  slabInitCache(&mntCache, "vfs mnt object cache", sizeof(struct FsMnt));
+
   llInitHead(&mnts);
 
-  root = malloc(sizeof(struct FsNode));
+  root = slabAlloc(&nodeCache);
 
   vfsMount("/", "", "tmp");
   vfsMount("/dev", "", "dev");

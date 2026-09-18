@@ -1,4 +1,3 @@
-#include <alloc.h>
 #include <debug.h>
 #include <ide.h>
 #include <vmm.h>
@@ -82,7 +81,7 @@ struct {
  * TODO: cleanup
  */
 
-static u8* buf;
+static u8 buf[2048];
 static volatile bool irqInvoked = 0;
 
 void ideSleep() {
@@ -171,7 +170,9 @@ u8 ideAccessAta(u8 dir, u8 disk, u32 lba, u8 sectAmount, u16* buf) {
   u8 lbaMode = 0; /* 0:chs, 1:lba28, 2:lba48 */
   bool dma = 0;
   u8 cmd = 0;
-  u8* lbaIo = calloc(6);
+
+  u8 lbaIo[6];
+  memset(lbaIo, 0, sizeof(lbaIo));
 
   u8 ch = (u8)dev[disk].Channel;
   u8 slave = (u8)dev[disk].Drive;
@@ -291,7 +292,6 @@ u8 ideAccessAta(u8 dir, u8 disk, u32 lba, u8 sectAmount, u16* buf) {
   } else {
     debug("ide: UNSUPPORTED");
   }
-  free(lbaIo);
   return 0;
 }
 
@@ -378,7 +378,8 @@ void ideEnum() {
   }
 }
 void ideInit(u32 bar0, u32 bar1, u32 bar2, u32 bar3, u32 bar4) {
-  buf = calloc(2048);
+  memset(buf, 0, sizeof(buf));
+
   channels[0].Base = (bar0 & 0xFFFFFFFC) + 0x1F0 * (!bar0);
   channels[0].Ctrl = (bar1 & 0xFFFFFFFC) + 0x3F4 * (!bar1);
   channels[1].Base = (bar2 & 0xFFFFFFFC) + 0x170 * (!bar2);

@@ -1,9 +1,9 @@
 #include <ahci.h>
-#include <alloc.h>
 #include <debug.h>
 #include <ide.h>
 #include <ll.h>
 #include <pci.h>
+#include <slab.h>
 
 #define CONFIG_ADDRESS 0xCF8
 #define CONFIG_DATA 0xCFC
@@ -50,7 +50,8 @@ static char* class[32] = {"Unknown",
                           "Encryption Controller",
                           "Signal Processing Controller"};
 
-static LLHead pciDevices;
+static SlabCache pciDeviceCache;
+static LLHead pciDeviceList;
 
 u32 pciIn32(u32 bus, u32 dev, u32 func, u32 offset) {
   u32 address;
@@ -126,12 +127,13 @@ void pciCheckDevice(u32 bus, u32 dev) {
     u16 vendor = pciIn16(bus, dev, f, 0);
     /* 0xFFFF - NONEXISTENT DEVICE */
     if (vendor != 0xFFFF) {
-      PCIDevice* d = (PCIDevice*)malloc(sizeof(PCIDevice));
+      PCIDevice* d = slabAlloc(&pciDeviceCache);
+
       llInitHead(&d->Head);
 
       pciReadData(bus, dev, f, d);
 
-      llInsertFront(&pciDevices, &d->Head);
+      llInsertFront(&pciDeviceList, &d->Head);
 
       debug(
           "pci: FOUND PCI: %s(%d) VENDOR:%x BAR0:%x BAR1:%x BAR2:%x BAR3:%x "
@@ -151,7 +153,9 @@ void pciEnum() {
   }
 }
 void pciInit() {
-  llInitHead(&pciDevices);
+  slabInitCache(&pciDeviceCache, "pci device object cache", sizeof(PCIDevice));
+
+  llInitHead(&pciDeviceList);
 
   pciEnum();
 }

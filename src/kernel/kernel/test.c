@@ -1,6 +1,5 @@
 #include <acpi.h>
 #include <ahci.h>
-#include <alloc.h>
 #include <debug.h>
 #include <fb.h>
 #include <font.h>
@@ -68,18 +67,6 @@ void test() {
   }
   printf("hi!\n");
 #endif
-// #define ALLOC_TEST
-#ifdef ALLOC_TEST
-  void* t[4096];
-  for (int i = 0; i < 830; i++) {
-    t[i] = calloc(4096);
-  }
-  spdmp();
-  for (int i = 0; i < 4096; i++) {
-    free(t[i]);
-  }
-  spdmp();
-#endif
 #define VFS_TEST
 #ifdef VFS_TEST
   struct FsFd* fd = vfsOpen("/dev/dbg", 0x67);
@@ -92,16 +79,16 @@ void test() {
 
   printf("* readdir on /dev *\n");
   struct FsFd* fd2 = vfsOpen("/dev", 0x03);
-  void* testt = calloc(1024);
-  struct linux_dirent64* dent = testt;
+  char testt[1024];
+  struct linux_dirent64* dent = (struct linux_dirent64*)testt;
 
   vfsReadDir(fd2, dent, 1);
   printf("%s\n", dent->d_name);
 
   printf("* readdir on / *\n");
   struct FsFd* fd3 = vfsOpen("/", 0x03);
-  void* testtt = calloc(1024);
-  struct linux_dirent64* dentt = testtt;
+  char testtt[1024];
+  struct linux_dirent64* dentt = (struct linux_dirent64*)testtt;
 
   vfsReadDir(fd3, dentt, 1);
 
