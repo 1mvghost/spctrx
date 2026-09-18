@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <debug.h>
+#include <printf.h>
 #include <slab.h>
 #include <vmm.h>
 
@@ -15,23 +16,23 @@ void slabAllocSlab(SlabCache* cache) {
    */
   Slab* header = (Slab*)slab;
 
-  header->Start = header + 1;
-  header->FirstFree = header->Start;
-  llInitHead(&header->Head);
-  header->UsedObj = 0;
+  header->start = header + 1;
+  header->firstFree = header->start;
+  llInitHead(&header->head);
+  header->usedObj = 0;
 
-  for (size_t i = 0; i < cache->ObjPerSlab - 1; i++) {
-    *(u64*)(header->Start + (i * cache->ObjSize)) =
-        (u64)header->Start + ((i + 1) * cache->ObjSize);
+  for (size_t i = 0; i < cache->objPerSlab - 1; i++) {
+    *(u64*)(header->start + (i * cache->objSize)) =
+        (u64)header->start + ((i + 1) * cache->objSize);
   }
 
   /*
    * insert it to the cache's linked list
    */
-  llInsertFront(&cache->Empty, &header->Head);
+  llInsertFront(&cache->empty, &header->head);
 
-  debug("slab: new slab for %s at %llx start:%llx firstfree:%llx\n",
-        cache->Name, slab, header->Start, header->FirstFree);
+  printf("slab: new slab for %s at %llx start:%llx firstfree:%llx\n",
+         cache->name, slab, header->start, header->firstFree);
 }
 
 void* slabAlloc(SlabCache* cache) {
@@ -39,30 +40,30 @@ void* slabAlloc(SlabCache* cache) {
 
   LLHead* selected;
 
-  if (llEmpty(&cache->Partial) && llEmpty(&cache->Empty)) {
+  if (llEmpty(&cache->partial) && llEmpty(&cache->empty)) {
     slabAllocSlab(cache);
     return slabAlloc(cache);
   }
 
-  if (llEmpty(&cache->Empty)) {
-    selected = &cache->Partial;
+  if (llEmpty(&cache->empty)) {
+    selected = &cache->partial;
   } else {
-    selected = &cache->Empty;
+    selected = &cache->empty;
   }
 
-  Slab* slab = LIST_ENTRY(selected->Next, Slab, Head);
+  Slab* slab = LIST_ENTRY(selected->next, Slab, head);
 
-  void* result = slab->FirstFree;
+  void* result = slab->firstFree;
 
-  slab->FirstFree = (void*)(*(u64*)slab->FirstFree);
-  slab->UsedObj++;
+  slab->firstFree = (void*)(*(u64*)slab->firstFree);
+  slab->usedObj++;
 
   /*
    * move the slab to the full list of slabs
    */
-  if (slab->UsedObj == cache->ObjPerSlab) {
-    llDelete(&slab->Head);
-    llInsertFront(&cache->Full, &slab->Head);
+  if (slab->usedObj == cache->objPerSlab) {
+    llDelete(&slab->head);
+    llInsertFront(&cache->full, &slab->head);
   }
 
   return result;
@@ -74,20 +75,20 @@ void slabFree(SlabCache* cache, void* addr) {
 
   Slab* slab = (Slab*)ALIGN_DOWN((u64)addr, SLAB_SIZE_PAGES * PAGE_SIZE);
 
-  *((u64*)addr) = (u64)slab->FirstFree;
+  *((u64*)addr) = (u64)slab->firstFree;
 
-  slab->FirstFree = addr;
-  slab->UsedObj--;
+  slab->firstFree = addr;
+  slab->usedObj--;
 
-  llDelete(&slab->Head);
+  llDelete(&slab->head);
 
   /*
    * switch slab states
    */
-  if (slab->UsedObj == 0) {
-    llInsertFront(&cache->Empty, &slab->Head);
+  if (slab->usedObj == 0) {
+    llInsertFront(&cache->empty, &slab->head);
   } else {
-    llInsertFront(&cache->Partial, &slab->Head);
+    llInsertFront(&cache->partial, &slab->head);
   }
 }
 
@@ -97,15 +98,15 @@ void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
 
   objSize = ALIGN_UP(objSize, 8);
 
-  cache->Name = name;
+  cache->name = name;
 
-  llInitHead(&cache->Full);
-  llInitHead(&cache->Partial);
-  llInitHead(&cache->Empty);
+  llInitHead(&cache->full);
+  llInitHead(&cache->partial);
+  llInitHead(&cache->empty);
 
-  cache->ObjSize = objSize;
-  cache->ObjPerSlab = ((SLAB_SIZE_PAGES * PAGE_SIZE) - sizeof(Slab)) / objSize;
+  cache->objSize = objSize;
+  cache->objPerSlab = ((SLAB_SIZE_PAGES * PAGE_SIZE) - sizeof(Slab)) / objSize;
 
-  debug("slab: new cache %s (%llx) objsize:%lld objperslab:%lld\n", name, cache,
-        objSize, cache->ObjPerSlab);
+  printf("slab: new cache %s (%llx) objsize:%lld objperslab:%lld\n", name,
+         cache, objSize, cache->objPerSlab);
 }

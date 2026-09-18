@@ -19,25 +19,24 @@
 #include <vmm.h>
 
 void test() {
-// #define IDE_TEST
 #ifdef IDE_TEST
   printf("ide: test\n");
-  u8* buf = calloc(512);
+  u8 buf[512];
+  memset(buf, 0, sizeof(buf));
   ideRead(0, 0, 1, buf);
   for (int i = 0; i < 512; i++)
     printf("%c", buf[i]);
-  free(buf);
+
   printf("\n");
 #endif
-// #define AHCI_TEST
 #ifdef AHCI_TEST
-  u8* buf = calloc(512);
+  char buf[512];
+  memset(buf, 0, sizeof(buf));
+
   printf("ahci: test\n");
-  buf = calloc(512);
   ahciRead(0, 0, 1, buf);
   for (int i = 0; i < 512; i++)
     printf("%c", buf[i]);
-  free(buf);
   printf("\n");
 #endif
 #ifdef SERIAL_TEST
@@ -98,24 +97,6 @@ void test() {
 #ifdef CONS_TEST
   for (int i = 0; i < 100000; i++) {
     printf("abb");
-  }
-#endif
-#ifdef LL_TEST
-  LinkedList ll;
-  llInit(&ll);
-
-  llAdd(&ll, "Hello World test");
-  llAdd(&ll, "Linked list test 123");
-  llAdd(&ll, "Linked list test 123");
-  llAdd(&ll, "Linked list test 123");
-  llAdd(&ll, "Linked list test 123");
-  llAdd(&ll, "Linked list test 123");
-  llAdd(&ll, "Linked list test 123");
-
-  LLNode* cur = ll.Head;
-  while (cur) {
-    printf("%s\n", cur->Data);
-    cur = cur->Next;
   }
 #endif
 #ifdef VMM_TEST

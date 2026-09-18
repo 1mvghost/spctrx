@@ -4,23 +4,23 @@
 #include <ll.h>
 
 typedef struct {
-  void* Start;
-  void* FirstFree;
+  void* start;
+  void* firstFree;
 
-  LLHead Head;
+  LLHead head;
 
-  size_t UsedObj;
+  size_t usedObj;
 } Slab;
 
 typedef struct {
-  char* Name;
+  char* name;
 
-  LLHead Full;
-  LLHead Partial;
-  LLHead Empty;
+  LLHead full;
+  LLHead partial;
+  LLHead empty;
 
-  size_t ObjSize;
-  size_t ObjPerSlab;
+  size_t objSize;
+  size_t objPerSlab;
 } SlabCache;
 
 void* slabAlloc(SlabCache* cache);

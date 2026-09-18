@@ -22,10 +22,10 @@ struct FsNode* tmpLookup(struct FsNode* n, char* name) {
 bool tmpReadDir(struct FsFd* fd, struct linux_dirent64* buf, u64 size) {
   if (!fd)
     return 0;
-  if (fd->Mnt->Root != fd->Inode) {
+  if (fd->mnt->root != fd->inode) {
     return 0;
   }
-  if (fd->Pos > 0) {
+  if (fd->pos > 0) {
     return 0;
   }
   if (size != 1) {
@@ -33,19 +33,19 @@ bool tmpReadDir(struct FsFd* fd, struct linux_dirent64* buf, u64 size) {
   }
   strcpy(buf->d_name, "dev");
   buf->d_reclen = sizeof(struct linux_dirent64) + strlen("dev");
-  buf->d_type = fd->Inode->Type;
+  buf->d_type = fd->inode->type;
   buf->d_ino = 67;
   return 1;
 }
-struct FsHandler tmpHandler = {.Lookup = tmpLookup,
-                               .ReadDir = tmpReadDir,
-                               .Open = tmpOpen};
+struct FsHandler tmpHandler = {.lookup = tmpLookup,
+                               .readdir = tmpReadDir,
+                               .open = tmpOpen};
 void tmpInit(struct FsMnt* mnt) {
-  debug("tmpfs: mnt is %s\n", mnt->Path);
+  debug("tmpfs: mnt is %s\n", mnt->path);
 
-  mnt->Root = vfsAlloc(mnt, TYPE_DIR);
-  mnt->Root->Ops = &tmpHandler;
+  mnt->root = vfsAlloc(mnt, TYPE_DIR);
+  mnt->root->ops = &tmpHandler;
 
   dirdev = vfsAlloc(mnt, TYPE_DIR);
-  dirdev->Ops = &tmpHandler;
+  dirdev->ops = &tmpHandler;
 }

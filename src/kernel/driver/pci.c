@@ -9,26 +9,26 @@
 #define CONFIG_DATA 0xCFC
 
 typedef struct {
-  u16 Vendor;
-  u16 Device;
-  u16 Cmd;
-  u16 Status;
-  u8 RevisionId;
-  u8 ProgIF;
-  u8 Subclass;
-  u8 Classcode;
-  u8 CacheLineSize;
-  u8 LatencyTimer;
-  u8 Header;
-  u8 Bist;
-  u32 Bar0;
-  u32 Bar1;
-  u32 Bar2;
-  u32 Bar3;
-  u32 Bar4;
-  u32 Bar5;
+  u16 vendor;
+  u16 device;
+  u16 cmd;
+  u16 status;
+  u8 revisionId;
+  u8 progIF;
+  u8 subclass;
+  u8 classcode;
+  u8 cacheLineSize;
+  u8 latencyTimer;
+  u8 header;
+  u8 bist;
+  u32 bar0;
+  u32 bar1;
+  u32 bar2;
+  u32 bar3;
+  u32 bar4;
+  u32 bar5;
 
-  LLHead Head;
+  LLHead head;
 } PCIDevice;
 
 static char* class[32] = {"Unknown",
@@ -81,13 +81,13 @@ u8 pciIn8Low(u32 bus, u32 dev, u32 func, u32 offset) {
   return (u8)(tmp & 0xFF);
 }
 void pciHandle(PCIDevice* dev) {
-  if (dev->Classcode == 1 && dev->Subclass == 1) {
+  if (dev->classcode == 1 && dev->subclass == 1) {
     /* IDE */
-    ideInit(dev->Bar0, dev->Bar1, dev->Bar2, dev->Bar3, dev->Bar4);
+    ideInit(dev->bar0, dev->bar1, dev->bar2, dev->bar3, dev->bar4);
   }
-  if (dev->Classcode == 1 && dev->Subclass == 6) {
+  if (dev->classcode == 1 && dev->subclass == 6) {
     /* AHCI */
-    ahciInit(dev->Bar5);
+    ahciInit(dev->bar5);
   }
 }
 
@@ -103,24 +103,24 @@ void pciReadData(u32 bus, u32 dev, u32 f, PCIDevice* buf) {
       u8 header =         pciIn8Low(bus,dev,f,14);
   */
 
-  buf->Vendor = pciIn16(bus, dev, f, 0);
-  buf->Device = pciIn16(bus, dev, f, 2);
-  buf->Cmd = pciIn16(bus, dev, f, 4);
-  buf->Status = pciIn16(bus, dev, f, 6);
-  buf->RevisionId = pciIn8Low(bus, dev, f, 8);
-  buf->ProgIF = pciIn8High(bus, dev, f, 8);
-  buf->Subclass = pciIn8Low(bus, dev, f, 10);
-  buf->Classcode = pciIn8High(bus, dev, f, 10);
-  buf->CacheLineSize = pciIn8Low(bus, dev, f, 0xC);
-  buf->LatencyTimer = pciIn8High(bus, dev, f, 0xC);
-  buf->Header = pciIn8Low(bus, dev, f, 0xF);
-  buf->Bist = pciIn8High(bus, dev, f, 0xF);
-  buf->Bar0 = pciIn32(bus, dev, f, 0x10);
-  buf->Bar1 = pciIn32(bus, dev, f, 0x14);
-  buf->Bar2 = pciIn32(bus, dev, f, 0x18);
-  buf->Bar3 = pciIn32(bus, dev, f, 0x1C);
-  buf->Bar4 = pciIn32(bus, dev, f, 0x20);
-  buf->Bar5 = pciIn32(bus, dev, f, 0x24);
+  buf->vendor = pciIn16(bus, dev, f, 0);
+  buf->device = pciIn16(bus, dev, f, 2);
+  buf->cmd = pciIn16(bus, dev, f, 4);
+  buf->status = pciIn16(bus, dev, f, 6);
+  buf->revisionId = pciIn8Low(bus, dev, f, 8);
+  buf->progIF = pciIn8High(bus, dev, f, 8);
+  buf->subclass = pciIn8Low(bus, dev, f, 10);
+  buf->classcode = pciIn8High(bus, dev, f, 10);
+  buf->cacheLineSize = pciIn8Low(bus, dev, f, 0xC);
+  buf->latencyTimer = pciIn8High(bus, dev, f, 0xC);
+  buf->header = pciIn8Low(bus, dev, f, 0xF);
+  buf->bist = pciIn8High(bus, dev, f, 0xF);
+  buf->bar0 = pciIn32(bus, dev, f, 0x10);
+  buf->bar1 = pciIn32(bus, dev, f, 0x14);
+  buf->bar2 = pciIn32(bus, dev, f, 0x18);
+  buf->bar3 = pciIn32(bus, dev, f, 0x1C);
+  buf->bar4 = pciIn32(bus, dev, f, 0x20);
+  buf->bar5 = pciIn32(bus, dev, f, 0x24);
 }
 void pciCheckDevice(u32 bus, u32 dev) {
   for (int f = 0; f < 8; f++) {
@@ -129,17 +129,17 @@ void pciCheckDevice(u32 bus, u32 dev) {
     if (vendor != 0xFFFF) {
       PCIDevice* d = slabAlloc(&pciDeviceCache);
 
-      llInitHead(&d->Head);
+      llInitHead(&d->head);
 
       pciReadData(bus, dev, f, d);
 
-      llInsertFront(&pciDeviceList, &d->Head);
+      llInsertFront(&pciDeviceList, &d->head);
 
       debug(
           "pci: FOUND PCI: %s(%d) VENDOR:%x BAR0:%x BAR1:%x BAR2:%x BAR3:%x "
           "BAR4:%x BAR5:%x HEADER:%x\n",
-          class[d->Classcode], d->Classcode, vendor, d->Subclass, d->Bar0,
-          d->Bar1, d->Bar2, d->Bar3, d->Bar4, d->Bar5, d->Header);
+          class[d->classcode], d->classcode, vendor, d->subclass, d->bar0,
+          d->bar1, d->bar2, d->bar3, d->bar4, d->bar5, d->header);
 
       pciHandle(d);
     }

@@ -1,18 +1,18 @@
 #include <idt.h>
 
 typedef struct {
-  u16 OffsetLow;
-  u16 Selector;
-  u8 Ist;
-  u8 Attributes;
-  u16 OffsetMid;
-  u32 OffsetHigh;
-  u32 Reserved;
+  u16 offsetLow;
+  u16 selector;
+  u8 ist;
+  u8 attributes;
+  u16 offsetMid;
+  u32 offsetHigh;
+  u32 reserved;
 } __attribute__((packed)) IDTEntry;
 
 typedef struct {
-  u16 Limit;
-  IDTEntry* Base;
+  u16 limit;
+  IDTEntry* base;
 } __attribute__((packed)) IDTR;
 
 __attribute__((aligned(0x10))) static IDTEntry idt[256];
@@ -22,17 +22,17 @@ extern void idtLoad(IDTR* idtr);
 
 void idtSetDesc(u8 i, void* isr, u8 flags) {
   IDTEntry* entry = &idt[i];
-  entry->OffsetLow = (u64)isr & 0xFFFF;
-  entry->Selector = 0x08;
-  entry->Attributes = flags;
-  entry->OffsetMid = ((u64)isr >> 16) & 0xFFFF;
-  entry->OffsetHigh = ((u64)isr >> 32) & 0xFFFFFFFF;
-  entry->Reserved = 0;
-  entry->Ist = 0;
+  entry->offsetLow = (u64)isr & 0xFFFF;
+  entry->selector = 0x08;
+  entry->attributes = flags;
+  entry->offsetMid = ((u64)isr >> 16) & 0xFFFF;
+  entry->offsetHigh = ((u64)isr >> 32) & 0xFFFFFFFF;
+  entry->reserved = 0;
+  entry->ist = 0;
 }
 void idtInit() {
-  idtr.Base = idt;
-  idtr.Limit = sizeof(idt) - 1;
+  idtr.base = idt;
+  idtr.limit = sizeof(idt) - 1;
 
   idtLoad(&idtr);
 }

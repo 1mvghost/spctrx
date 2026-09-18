@@ -4,25 +4,25 @@
 #include <util.h>
 
 typedef volatile struct {
-  u32 Clb;
-  u32 ClbUp;
-  u32 Fb;
-  u32 FbUp;
-  u32 Is;
-  u32 Ie;
-  u32 Cmd;
-  u32 Reserved;
-  u32 Tfd;
-  u32 Sign;
-  u32 Ssts;
-  u32 SCtrl;
-  u32 SErr;
-  u32 SAct;
-  u32 Ci;
-  u32 Sntf;
-  u32 Fbs;
-  u32 Reserved1[11];
-  u32 Vendor[4];
+  u32 clb;
+  u32 clbUp;
+  u32 fb;
+  u32 fbUp;
+  u32 is;
+  u32 ie;
+  u32 cmd;
+  u32 reserved;
+  u32 tfd;
+  u32 sign;
+  u32 ssts;
+  u32 sCtrl;
+  u32 sErr;
+  u32 sAct;
+  u32 ci;
+  u32 sntf;
+  u32 fbs;
+  u32 reserved1[11];
+  u32 vendor[4];
 } HbaPort;
 
 bool ahciRead(int p, u64 lba, u32 sectAmount, void* buf);

@@ -9,10 +9,10 @@
   ((type*)((char*)(ptr) - (unsigned long)(&((type*)0)->member)))
 
 #define LL_TRAVERSE(curr, head) \
-  for (curr = (head)->Next; curr != head; curr = curr->Next)
+  for (curr = (head)->next; curr != head; curr = curr->next)
 ;
 typedef struct _LLHead {
-  struct _LLHead *Prev, *Next;
+  struct _LLHead *prev, *next;
 } LLHead;
 
 void llInitHead(LLHead* head);

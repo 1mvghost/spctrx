@@ -1,18 +1,18 @@
 #include <gdt.h>
 
 typedef struct {
-  u16 LimitLow;
-  u16 BaseLow;
-  u8 BaseMid;
-  u8 Access;
-  u8 LimitHigh : 4;
-  u8 Flags : 4;
-  u8 BaseHigh;
+  u16 limitLow;
+  u16 baseLow;
+  u8 baseMid;
+  u8 access;
+  u8 limitHigh : 4;
+  u8 flags : 4;
+  u8 baseHigh;
 } __attribute__((packed)) GDTEntry;
 
 typedef struct {
-  u16 Limit;
-  GDTEntry* Base;
+  u16 limit;
+  GDTEntry* base;
 } __attribute__((packed)) GDTR;
 
 __attribute__((aligned(0x08))) static GDTEntry gdt[6];
@@ -23,19 +23,20 @@ extern void segReload();
 
 void gdtSetDesc(u8 i, u32 limit, u32 base, u8 access, u8 flags) {
   GDTEntry* entry = &gdt[i];
-  entry->BaseLow = base & 0xffff;
-  entry->BaseMid = (base >> 16) & 0xff;
-  entry->BaseHigh = (base >> 24) & 0xff;
-  entry->Access = access;
-  entry->LimitLow = limit & 0xffff;
-  entry->LimitHigh = (limit >> 16) & 0xf;
-  entry->Flags = flags;
+  entry->baseLow = base & 0xffff;
+  entry->baseMid = (base >> 16) & 0xff;
+  entry->baseHigh = (base >> 24) & 0xff;
+  entry->access = access;
+  entry->limitLow = limit & 0xffff;
+  entry->limitHigh = (limit >> 16) & 0xf;
+  entry->flags = flags;
 }
 
 void gdtInit() {
   memset(gdt, 0, sizeof(gdt));
-  gdtr.Base = gdt;
-  gdtr.Limit = sizeof(gdt) - 1;
+
+  gdtr.base = gdt;
+  gdtr.limit = sizeof(gdt) - 1;
 
   gdtSetDesc(0, 0, 0, 0, 0);
   gdtSetDesc(1, 0x00ffffff, 0, 0x9a, 0xa);

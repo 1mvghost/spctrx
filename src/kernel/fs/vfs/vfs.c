@@ -15,12 +15,12 @@ static SlabCache nodeCache;
 struct FsNode* vfsAlloc(struct FsMnt* mnt, u8 type) {
   struct FsNode* n = slabAlloc(&nodeCache);
 
-  n->Type = type;
-  n->Mnt = mnt;
-  n->Ops = 0;
+  n->type = type;
+  n->mnt = mnt;
+  n->ops = 0;
 
-  if (mnt->Root) {
-    n->Ops = mnt->Root->Ops;
+  if (mnt->root) {
+    n->ops = mnt->root->ops;
   }
 
   return n;
@@ -31,8 +31,8 @@ struct FsMnt* vfsFindMnt(struct FsNode* n) {
 
   LLHead* curr;
   LL_TRAVERSE(curr, &mnts) {
-    struct FsMnt* mnt = LIST_ENTRY(curr, struct FsMnt, Head);
-    if (mnt->Mountpoint == n) {
+    struct FsMnt* mnt = LIST_ENTRY(curr, struct FsMnt, head);
+    if (mnt->mountpoint == n) {
       return mnt;
     }
   }
@@ -42,17 +42,17 @@ struct FsMnt* vfsFindMnt(struct FsNode* n) {
 struct FsNode* vfsLook(struct FsNode* cur, char* name) {
   if (!cur)
     return 0;
-  if (cur->Type == TYPE_FILE)
+  if (cur->type == TYPE_FILE)
     return 0;
-  if (!(cur->Ops && cur->Ops->Lookup))
+  if (!(cur->ops && cur->ops->lookup))
     return 0;
 
-  struct FsNode* c = cur->Ops->Lookup(cur, name);
+  struct FsNode* c = cur->ops->lookup(cur, name);
 
   /* mnt check */
   struct FsMnt* mnt = vfsFindMnt(c);
   if (mnt)
-    c = mnt->Root;
+    c = mnt->root;
 
   return c;
 }
@@ -64,7 +64,7 @@ struct FsNode* vfsLookup(char* path) {
 
   struct FsMnt* mnt = vfsFindMnt(cur);
   if (mnt)
-    cur = mnt->Root;
+    cur = mnt->root;
 
   char sp[64];
   sp[0] = '\0';
@@ -79,7 +79,7 @@ struct FsNode* vfsLookup(char* path) {
 
         if (!cur)
           return 0;
-        if (cur->Type == TYPE_FILE)
+        if (cur->type == TYPE_FILE)
           return 0;
       }
 
@@ -108,10 +108,12 @@ static SlabCache fdCache;
 
 struct FsFd* vfsFdAlloc(struct FsNode* n, u64 flags) {
   struct FsFd* fd = slabAlloc(&fdCache);
-  fd->Inode = n;
-  fd->Pos = 0;
-  fd->Mnt = n->Mnt;
-  fd->Flags = flags;
+
+  fd->inode = n;
+  fd->pos = 0;
+  fd->mnt = n->mnt;
+  fd->flags = flags;
+
   return fd;
 }
 
@@ -131,14 +133,14 @@ void vfsMount(char* path, char* dev, char* type) {
 
   struct FsMnt* mnt = slabAlloc(&mntCache);
 
-  strcpy(mnt->Type, type);
-  strcpy(mnt->Dev, dev);
-  strcpy(mnt->Path, path);
+  strcpy(mnt->type, type);
+  strcpy(mnt->dev, dev);
+  strcpy(mnt->path, path);
 
-  mnt->Mountpoint = l;
-  mnt->Root = 0;
+  mnt->mountpoint = l;
+  mnt->root = 0;
 
-  llInitHead(&mnt->Head);
+  llInitHead(&mnt->head);
 
   if (!strcmp(type, "dev")) {
     devInit(mnt);
@@ -147,7 +149,7 @@ void vfsMount(char* path, char* dev, char* type) {
     tmpInit(mnt);
   }
 
-  llInsertFront(&mnts, &mnt->Head);
+  llInsertFront(&mnts, &mnt->head);
 
   debug("vfs: MOUNTED %s\n", path);
 

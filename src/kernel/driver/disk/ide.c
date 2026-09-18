@@ -59,22 +59,22 @@
 #define ATA_WRITE 0x01
 
 struct {
-  u16 Base;
-  u16 Ctrl;
-  u16 BMIde;
-  u8 NieN;
+  u16 base;
+  u16 ctrl;
+  u16 bmIde;
+  u8 nieN;
 } channels[2];
 
 struct {
-  u8 Reserved;
-  u8 Channel;
-  u8 Drive;
-  u16 Type;
-  u16 Sign;
-  u16 Capabilities;
-  u32 CmdSets;
-  u32 Size;
-  u8 Model[41];
+  u8 reserved;
+  u8 channel;
+  u8 drive;
+  u16 type;
+  u16 sign;
+  u16 capabilities;
+  u32 cmdSets;
+  u32 size;
+  u8 model[41];
 } dev[4];
 
 /**
@@ -91,19 +91,19 @@ void ideSleep() {
 u8 ideIn8(u8 ch, u8 reg) {
   u8 res;
   if (reg > 0x07 && reg < 0x0C) {
-    ideOut8(ch, ATA_REG_CONTROL, 0x80 | channels[ch].NieN);
+    ideOut8(ch, ATA_REG_CONTROL, 0x80 | channels[ch].nieN);
   }
   if (reg < 0x08)
-    res = in8(channels[ch].Base + reg - (u8)0x00);
+    res = in8(channels[ch].base + reg - (u8)0x00);
   else if (reg < 0x0C)
-    res = in8(channels[ch].Base + reg - (u8)0x06);
+    res = in8(channels[ch].base + reg - (u8)0x06);
   else if (reg < 0x0E)
-    res = in8(channels[ch].Ctrl + reg - (u8)0x0C);
+    res = in8(channels[ch].ctrl + reg - (u8)0x0C);
   else if (reg < 0x16)
-    res = in8(channels[ch].BMIde + reg - (u8)0x0E);
+    res = in8(channels[ch].bmIde + reg - (u8)0x0E);
 
   if (reg > 0x07 && reg < 0x0C) {
-    ideOut8(ch, ATA_REG_CONTROL, channels[ch].NieN);
+    ideOut8(ch, ATA_REG_CONTROL, channels[ch].nieN);
   }
   return res;
 }
@@ -113,38 +113,38 @@ void ideWaitBsy(u8 ch) {
 }
 void ideOut8(u8 ch, u8 reg, u8 data) {
   if (reg > 0x07 && reg < 0x0C) {
-    ideOut8(ch, ATA_REG_CONTROL, 0x80 | channels[ch].NieN);
+    ideOut8(ch, ATA_REG_CONTROL, 0x80 | channels[ch].nieN);
   }
   if (reg < 0x08)
-    out8(channels[ch].Base + reg - 0x00, data);
+    out8(channels[ch].base + reg - 0x00, data);
   else if (reg < 0x0C)
-    out8(channels[ch].Base + reg - 0x06, data);
+    out8(channels[ch].base + reg - 0x06, data);
   else if (reg < 0x0E)
-    out8(channels[ch].Ctrl + reg - 0x0C, data);
+    out8(channels[ch].ctrl + reg - 0x0C, data);
   else if (reg < 0x16)
-    out8(channels[ch].BMIde + reg - 0x0E, data);
+    out8(channels[ch].bmIde + reg - 0x0E, data);
 
   if (reg > 0x07 && reg < 0x0C) {
-    ideOut8(ch, ATA_REG_CONTROL, channels[ch].NieN);
+    ideOut8(ch, ATA_REG_CONTROL, channels[ch].nieN);
   }
 }
 void ideInBuf(u8 ch, u8 reg, u32* buf, u64 q) {
   if (reg > 0x07 && reg < 0x0C) {
-    ideOut8(ch, ATA_REG_CONTROL, 0x80 | channels[ch].NieN);
+    ideOut8(ch, ATA_REG_CONTROL, 0x80 | channels[ch].nieN);
   }
   asm("pushw %bx; movw %es, %bx; pushw %ax; movw %ds, %ax; movw %ax, %es; popw "
       "%ax;");
   if (reg < 0x08)
-    ins32(channels[ch].Base + reg - 0x00, buf, q);
+    ins32(channels[ch].base + reg - 0x00, buf, q);
   else if (reg < 0x0C)
-    ins32(channels[ch].Base + reg - 0x06, buf, q);
+    ins32(channels[ch].base + reg - 0x06, buf, q);
   else if (reg < 0x0E)
-    ins32(channels[ch].Ctrl + reg - 0x0C, buf, q);
+    ins32(channels[ch].ctrl + reg - 0x0C, buf, q);
   else if (reg < 0x16)
-    ins32(channels[ch].BMIde + reg - 0x0E, buf, q);
+    ins32(channels[ch].bmIde + reg - 0x0E, buf, q);
   asm("movw %bx, %es; popw %bx;");
   if (reg > 0x07 && reg < 0x0C) {
-    ideOut8(ch, ATA_REG_CONTROL, channels[ch].NieN);
+    ideOut8(ch, ATA_REG_CONTROL, channels[ch].nieN);
   }
 }
 
@@ -174,17 +174,17 @@ u8 ideAccessAta(u8 dir, u8 disk, u32 lba, u8 sectAmount, u16* buf) {
   u8 lbaIo[6];
   memset(lbaIo, 0, sizeof(lbaIo));
 
-  u8 ch = (u8)dev[disk].Channel;
-  u8 slave = (u8)dev[disk].Drive;
-  u16 bus = channels[ch].Base;
+  u8 ch = (u8)dev[disk].channel;
+  u8 slave = (u8)dev[disk].drive;
+  u16 bus = channels[ch].base;
 
   u32 words = 256;
   u16 i = 0;
   u8 head = 0;
 
-  ideOut8(ch, ATA_REG_CONTROL, channels[ch].NieN = (irqInvoked = 0x0) + 0x02);
+  ideOut8(ch, ATA_REG_CONTROL, channels[ch].nieN = (irqInvoked = 0x0) + 0x02);
 
-  u16 lbaSupport = dev[disk].Capabilities & 0x200;
+  u16 lbaSupport = dev[disk].capabilities & 0x200;
   if (lba >= 0x10000000) {
     lbaMode = 2;
     lbaIo[0] = (lba & 0x000000FF) >> 0;
@@ -296,14 +296,14 @@ u8 ideAccessAta(u8 dir, u8 disk, u32 lba, u8 sectAmount, u16* buf) {
 }
 
 void ideRead(u8 disk, u32 lba, u8 sectAmount, void* buf) {
-  if (disk > 3 || !dev[disk].Reserved) {
+  if (disk > 3 || !dev[disk].reserved) {
     debug("ide: TRYING TO READ FROM A NONEXISTENT DRIVE\n");
     return;
-  } else if (((lba + sectAmount) > dev[disk].Size) && dev[disk].Type == 0) {
+  } else if (((lba + sectAmount) > dev[disk].size) && dev[disk].type == 0) {
     debug("ide: READING TO INVALID POSITION\n");
     return;
   } else {
-    if (dev[disk].Type == 0) {
+    if (dev[disk].type == 0) {
       ideAccessAta(ATA_READ, disk, lba, sectAmount, (u16*)buf);
     } else {
       debug("ide: READING FROM UNSUPPORTED DISK TYPE (for now)\n");
@@ -316,7 +316,7 @@ void ideEnum() {
   for (i = 0; i < 2; i++) {
     for (j = 0; j < 2; j++) {
       u8 err = 0, type = 0, status = 0;
-      dev[cnt].Reserved = 0;
+      dev[cnt].reserved = 0;
 
       ideOut8(i, ATA_REG_HDDEVSEL, 0xA0 | (j << 4));
       ideSleep();
@@ -349,29 +349,29 @@ void ideEnum() {
       }
       ideInBuf(i, ATA_REG_DATA, (u32*)buf, 128);
 
-      dev[cnt].Reserved = 1;
-      dev[cnt].Type = type;
-      dev[cnt].Channel = i;
-      dev[cnt].Drive = j;
-      dev[cnt].Sign = *((u16*)(buf + ATA_IDENT_DEVICETYPE));
-      dev[cnt].Capabilities = *((u16*)(buf + ATA_IDENT_CAPABILITIES));
-      dev[cnt].CmdSets = *((u32*)(buf + ATA_IDENT_COMMANDSETS));
+      dev[cnt].reserved = 1;
+      dev[cnt].type = type;
+      dev[cnt].channel = i;
+      dev[cnt].drive = j;
+      dev[cnt].sign = *((u16*)(buf + ATA_IDENT_DEVICETYPE));
+      dev[cnt].capabilities = *((u16*)(buf + ATA_IDENT_CAPABILITIES));
+      dev[cnt].cmdSets = *((u32*)(buf + ATA_IDENT_COMMANDSETS));
 
-      if (dev[cnt].CmdSets & (1 << 26)) {
-        dev[cnt].Size = *((u32*)(buf + ATA_IDENT_MAX_LBA_EXT));
+      if (dev[cnt].cmdSets & (1 << 26)) {
+        dev[cnt].size = *((u32*)(buf + ATA_IDENT_MAX_LBA_EXT));
       } else {
-        dev[cnt].Size = *((u32*)(buf + ATA_IDENT_MAX_LBA));
+        dev[cnt].size = *((u32*)(buf + ATA_IDENT_MAX_LBA));
       }
 
       /* read in model */
       int k;
       for (k = 0; k < 40; k += 2) {
-        dev[cnt].Model[k] = buf[ATA_IDENT_MODEL + k + 1];
-        dev[cnt].Model[k + 1] = buf[ATA_IDENT_MODEL + k];
-        if (!dev[cnt].Model[k])
+        dev[cnt].model[k] = buf[ATA_IDENT_MODEL + k + 1];
+        dev[cnt].model[k + 1] = buf[ATA_IDENT_MODEL + k];
+        if (!dev[cnt].model[k])
           break;
       }
-      dev[cnt].Model[k] = 0;
+      dev[cnt].model[k] = 0;
 
       cnt++;
     }
@@ -380,12 +380,12 @@ void ideEnum() {
 void ideInit(u32 bar0, u32 bar1, u32 bar2, u32 bar3, u32 bar4) {
   memset(buf, 0, sizeof(buf));
 
-  channels[0].Base = (bar0 & 0xFFFFFFFC) + 0x1F0 * (!bar0);
-  channels[0].Ctrl = (bar1 & 0xFFFFFFFC) + 0x3F4 * (!bar1);
-  channels[1].Base = (bar2 & 0xFFFFFFFC) + 0x170 * (!bar2);
-  channels[1].Ctrl = (bar3 & 0xFFFFFFFC) + 0x374 * (!bar3);
-  channels[0].BMIde = (bar4 & 0xFFFFFFFC) + 0;
-  channels[1].BMIde = (bar4 & 0xFFFFFFFC) + 8;
+  channels[0].base = (bar0 & 0xFFFFFFFC) + 0x1F0 * (!bar0);
+  channels[0].ctrl = (bar1 & 0xFFFFFFFC) + 0x3F4 * (!bar1);
+  channels[1].base = (bar2 & 0xFFFFFFFC) + 0x170 * (!bar2);
+  channels[1].ctrl = (bar3 & 0xFFFFFFFC) + 0x374 * (!bar3);
+  channels[0].bmIde = (bar4 & 0xFFFFFFFC) + 0;
+  channels[1].bmIde = (bar4 & 0xFFFFFFFC) + 8;
 
   ideOut8(0, ATA_REG_CONTROL, 2);
   ideOut8(1, ATA_REG_CONTROL, 2);
@@ -394,10 +394,10 @@ void ideInit(u32 bar0, u32 bar1, u32 bar2, u32 bar3, u32 bar4) {
 
   int i = 0;
   for (i = 0; i < 4; i++) {
-    if (dev[i].Reserved == 1) {
+    if (dev[i].reserved == 1) {
       debug("ide: FOUND IDE: TYPE:%s SIZE:%d MODEL:%s\n",
-            (const char*[]){"ATA", "ATAPI"}[dev[i].Type], dev[i].Size,
-            dev[i].Model);
+            (const char*[]){"ATA", "ATAPI"}[dev[i].type], dev[i].size,
+            dev[i].model);
     }
   }
 }
