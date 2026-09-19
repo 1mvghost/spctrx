@@ -4,7 +4,11 @@
 #include <slab.h>
 #include <vmm.h>
 
-#define SLAB_SIZE_PAGES 4
+/*
+ * todo: make a pmm aligned alloc function so aligning down in slabFree() wont
+ * bug with multiple pages
+ */
+#define SLAB_SIZE_PAGES 1
 
 void slabAllocSlab(SlabCache* cache) {
   ASSERT(cache != 0);
@@ -31,8 +35,8 @@ void slabAllocSlab(SlabCache* cache) {
    */
   llInsertFront(&cache->empty, &header->head);
 
-  printf("slab: new slab for %s at %llx start:%llx firstfree:%llx\n",
-         cache->name, slab, header->start, header->firstFree);
+  debug("slab: new slab for %s at %llx start:%llx firstfree:%llx\n",
+        cache->name, slab, header->start, header->firstFree);
 }
 
 void* slabAlloc(SlabCache* cache) {
@@ -107,6 +111,6 @@ void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
   cache->objSize = objSize;
   cache->objPerSlab = ((SLAB_SIZE_PAGES * PAGE_SIZE) - sizeof(Slab)) / objSize;
 
-  printf("slab: new cache %s (%llx) objsize:%lld objperslab:%lld\n", name,
-         cache, objSize, cache->objPerSlab);
+  debug("slab: new cache %s (%llx) objsize:%lld objperslab:%lld\n", name, cache,
+        objSize, cache->objPerSlab);
 }
