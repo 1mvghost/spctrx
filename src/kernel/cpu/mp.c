@@ -7,8 +7,8 @@
 void mpEntry(struct limine_mp_info* mp) {
   UNUSED(mp);
 
-  gdtMCpuInit();
-  idtMCpuInit();
+  gdtFlush();
+  idtFlush();
 
   asm("cli");
   asm("hlt");

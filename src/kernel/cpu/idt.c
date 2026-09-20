@@ -30,12 +30,14 @@ void idtSetDesc(u8 i, void* isr, u8 flags) {
   entry->reserved = 0;
   entry->ist = 0;
 }
+
 void idtInit() {
   idtr.base = idt;
   idtr.limit = sizeof(idt) - 1;
 
-  idtLoad(&idtr);
+  idtFlush();
 }
-void idtMCpuInit() {
+
+void idtFlush() {
   idtLoad(&idtr);
 }

@@ -44,11 +44,10 @@ void gdtInit() {
   gdtSetDesc(3, 0x00ffffff, 0, 0xfa, 0xa);
   gdtSetDesc(4, 0x00ffffff, 0, 0xf2, 0xc);
 
-  gdtLoad(&gdtr);
-  segReload(); /* change code to 0x08 and data to 0x10 */
+  gdtFlush();
 }
 
-void gdtMCpuInit() {
+void gdtFlush() {
   gdtLoad(&gdtr);
   segReload(); /* change code to 0x08 and data to 0x10 */
 }
