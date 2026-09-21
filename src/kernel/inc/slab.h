@@ -2,6 +2,7 @@
 #define SLAB_H
 
 #include <ll.h>
+#include <mem.h>
 
 typedef struct {
   void* start;
@@ -21,6 +22,8 @@ typedef struct {
 
   size_t objSize;
   size_t objPerSlab;
+
+  Splock lock;
 } SlabCache;
 
 void* slabAlloc(SlabCache* cache);

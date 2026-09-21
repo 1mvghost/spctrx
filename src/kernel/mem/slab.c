@@ -42,10 +42,15 @@ void slabAllocSlab(SlabCache* cache) {
 void* slabAlloc(SlabCache* cache) {
   ASSERT(cache != 0);
 
+  mSpinlockAcquire(&cache->lock);
+
   LLHead* selected;
 
   if (llEmpty(&cache->partial) && llEmpty(&cache->empty)) {
     slabAllocSlab(cache);
+
+    mSpinlockDrop(&cache->lock);
+
     return slabAlloc(cache);
   }
 
@@ -70,12 +75,16 @@ void* slabAlloc(SlabCache* cache) {
     llInsertFront(&cache->full, &slab->head);
   }
 
+  mSpinlockDrop(&cache->lock);
+
   return result;
 }
 
 void slabFree(SlabCache* cache, void* addr) {
   ASSERT(cache != 0);
   ASSERT(addr != 0);
+
+  mSpinlockAcquire(&cache->lock);
 
   Slab* slab = (Slab*)ALIGN_DOWN((u64)addr, SLAB_SIZE_PAGES * PAGE_SIZE);
 
@@ -94,6 +103,8 @@ void slabFree(SlabCache* cache, void* addr) {
   } else {
     llInsertFront(&cache->partial, &slab->head);
   }
+
+  mSpinlockDrop(&cache->lock);
 }
 
 void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
@@ -110,6 +121,7 @@ void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
 
   cache->objSize = objSize;
   cache->objPerSlab = ((SLAB_SIZE_PAGES * PAGE_SIZE) - sizeof(Slab)) / objSize;
+  cache->lock = (Splock)ATOMIC_FLAG_INIT;
 
   debug("slab: new cache %s (%llx) objsize:%lld objperslab:%lld\n", name, cache,
         objSize, cache->objPerSlab);
