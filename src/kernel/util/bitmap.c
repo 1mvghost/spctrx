@@ -50,7 +50,7 @@ void bitmapFillAll(Bitmap* bitmap, bool value) {
 void bitmapFill(Bitmap* bitmap, size_t from, size_t to, bool value) {
   ASSERT(bitmap != 0);
   ASSERT(from < bitmap->bits);
-  ASSERT(to < bitmap->bits);
+  ASSERT(to <= bitmap->bits);
 
   for (size_t pos = from; pos < to; pos++) {
     bitmapSet(bitmap, pos, value);
