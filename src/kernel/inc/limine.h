@@ -63,7 +63,7 @@ struct limine_file {
     LIMINE_PTR(char *) string;
     uint32_t media_type;
     uint32_t unused;
-    uint32_t tftp_ip;
+    uint8_t tftp_ipv4[4];
     uint32_t tftp_port;
     uint32_t partition_index;
     uint32_t mbr_disk_id;
@@ -206,6 +206,46 @@ struct limine_framebuffer_request {
     LIMINE_PTR(struct limine_framebuffer_response *) response;
 };
 
+/* Flanterm FB init params */
+
+#define LIMINE_FLANTERM_FB_INIT_PARAMS_REQUEST_ID { LIMINE_COMMON_MAGIC, 0x3259399fe7c5f126, 0xe01c1c8c5db9d1a9 }
+
+#define LIMINE_FLANTERM_FB_ROTATE_0 0
+#define LIMINE_FLANTERM_FB_ROTATE_90 1
+#define LIMINE_FLANTERM_FB_ROTATE_180 2
+#define LIMINE_FLANTERM_FB_ROTATE_270 3
+
+struct limine_flanterm_fb_init_params {
+    LIMINE_PTR(uint32_t *) canvas;
+    uint64_t canvas_size;
+    uint32_t ansi_colours[8];
+    uint32_t ansi_bright_colours[8];
+    uint32_t default_bg;
+    uint32_t default_fg;
+    uint32_t default_bg_bright;
+    uint32_t default_fg_bright;
+    LIMINE_PTR(void *) font;
+    uint64_t font_width;
+    uint64_t font_height;
+    uint64_t font_spacing;
+    uint64_t font_scale_x;
+    uint64_t font_scale_y;
+    uint64_t margin;
+    uint64_t rotation;
+};
+
+struct limine_flanterm_fb_init_params_response {
+    uint64_t revision;
+    uint64_t entry_count;
+    LIMINE_PTR(struct limine_flanterm_fb_init_params **) entries;
+};
+
+struct limine_flanterm_fb_init_params_request {
+    uint64_t id[4];
+    uint64_t revision;
+    LIMINE_PTR(struct limine_flanterm_fb_init_params_response *) response;
+};
+
 /* Paging mode */
 
 #define LIMINE_PAGING_MODE_REQUEST_ID { LIMINE_COMMON_MAGIC, 0x95c1a0edab0944cb, 0xa4e5cb3842f7488a }
@@ -252,7 +292,7 @@ struct limine_mp_info;
 
 typedef void (*limine_goto_address)(struct limine_mp_info *);
 
-#if defined (__x86_64__) || defined (__i386__)
+#if defined (__x86_64__) || defined (__i386__) || defined(_M_X64) || defined(_M_AMD64) || defined(_M_IX86)
 
 #define LIMINE_MP_RESPONSE_X86_64_X2APIC (1 << 0)
 
@@ -272,7 +312,7 @@ struct limine_mp_response {
     LIMINE_PTR(struct limine_mp_info **) cpus;
 };
 
-#elif defined (__aarch64__)
+#elif defined (__aarch64__) || defined(_M_ARM64)
 
 struct limine_mp_info {
     uint32_t processor_id;
@@ -312,10 +352,17 @@ struct limine_mp_response {
 #elif defined (__loongarch__) && (__loongarch_grlen == 64)
 
 struct limine_mp_info {
+    uint64_t processor_id;
+    uint64_t phys_id;
     uint64_t reserved;
+    LIMINE_PTR(limine_goto_address) goto_address;
+    uint64_t extra_argument;
 };
 
 struct limine_mp_response {
+    uint64_t revision;
+    uint64_t flags;
+    uint64_t bsp_phys_id;
     uint64_t cpu_count;
     LIMINE_PTR(struct limine_mp_info **) cpus;
 };
@@ -345,7 +392,7 @@ struct limine_mp_request {
 #define LIMINE_MEMMAP_BOOTLOADER_RECLAIMABLE 5
 #define LIMINE_MEMMAP_EXECUTABLE_AND_MODULES 6
 #define LIMINE_MEMMAP_FRAMEBUFFER            7
-#define LIMINE_MEMMAP_ACPI_TABLES            8
+#define LIMINE_MEMMAP_RESERVED_MAPPED        8
 
 struct limine_memmap_entry {
     uint64_t base;
@@ -447,8 +494,8 @@ struct limine_rsdp_request {
 
 struct limine_smbios_response {
     uint64_t revision;
-    uint64_t entry_32;
-    uint64_t entry_64;
+    LIMINE_PTR(void *) entry_32;
+    LIMINE_PTR(void *) entry_64;
 };
 
 struct limine_smbios_request {
@@ -463,13 +510,33 @@ struct limine_smbios_request {
 
 struct limine_efi_system_table_response {
     uint64_t revision;
-    uint64_t address;
+    LIMINE_PTR(void *) address;
 };
 
 struct limine_efi_system_table_request {
     uint64_t id[4];
     uint64_t revision;
     LIMINE_PTR(struct limine_efi_system_table_response *) response;
+};
+
+/* TPM event log */
+
+#define LIMINE_TPM_EVENT_LOG_REQUEST_ID { LIMINE_COMMON_MAGIC, 0x98e094fc7e76e979, 0xee8d8775c54e1d1f }
+
+#define LIMINE_TPM_EVENT_LOG_FORMAT_TCG_1_2 1
+#define LIMINE_TPM_EVENT_LOG_FORMAT_TCG_2   2
+
+struct limine_tpm_event_log_response {
+    uint64_t revision;
+    uint64_t format;
+    uint64_t size;
+    LIMINE_PTR(void *) address;
+};
+
+struct limine_tpm_event_log_request {
+    uint64_t id[4];
+    uint64_t revision;
+    LIMINE_PTR(struct limine_tpm_event_log_response *) response;
 };
 
 /* EFI memory map */
@@ -566,6 +633,50 @@ struct limine_bootloader_performance_request {
     uint64_t id[4];
     uint64_t revision;
     LIMINE_PTR(struct limine_bootloader_performance_response *) response;
+};
+
+#define LIMINE_X86_64_KEEP_IOMMU_REQUEST_ID { LIMINE_COMMON_MAGIC, 0x8ebaabe51f490179, 0x2aa86a59ffb4ab0f }
+
+struct limine_x86_64_keep_iommu_response {
+    uint64_t revision;
+};
+
+struct limine_x86_64_keep_iommu_request {
+    uint64_t id[4];
+    uint64_t revision;
+    LIMINE_PTR(struct limine_x86_64_keep_iommu_response *) response;
+};
+
+/* TSC (Timestamp Counter) Frequency */
+
+#define LIMINE_TSC_FREQUENCY_REQUEST_ID { LIMINE_COMMON_MAGIC, 0x10f2ee1d87d195e4, 0xf747a2b78f6ddb31 }
+
+struct limine_tsc_frequency_response {
+    uint64_t revision;
+    uint64_t frequency;
+};
+
+struct limine_tsc_frequency_request {
+    uint64_t id[4];
+    uint64_t revision;
+    LIMINE_PTR(struct limine_tsc_frequency_response *) response;
+};
+
+/* Entropy */
+
+#define LIMINE_ENTROPY_REQUEST_ID { LIMINE_COMMON_MAGIC, 0x65ea80255d5682c5, 0x9117240723f493eb }
+
+struct limine_entropy_response {
+    uint64_t revision;
+    uint64_t value_count;
+    LIMINE_PTR(uint64_t *) values;
+};
+
+struct limine_entropy_request {
+    uint64_t id[4];
+    uint64_t revision;
+    LIMINE_PTR(struct limine_entropy_response *) response;
+    uint64_t value_count;
 };
 
 #ifdef __cplusplus
