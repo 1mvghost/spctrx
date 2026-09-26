@@ -3,7 +3,8 @@
 #include <debug.h>
 
 #define INDEX(pos) (pos / 64)
-#define BIT(pos) (pos % 64)
+#define BIT_INDEX(pos) (pos % 64)
+#define BIT(pos) ((size_t)1 << BIT_INDEX(pos))
 
 void bitmapInit(Bitmap* bitmap, size_t bits, u64* data) {
   ASSERT(bitmap != 0);
@@ -24,9 +25,9 @@ void bitmapSet(Bitmap* bitmap, size_t pos, bool value) {
   ASSERT(pos < bitmap->bits);
 
   if (value) {
-    bitmap->data[INDEX(pos)] |= (1 << BIT(pos));
+    bitmap->data[INDEX(pos)] |= BIT(pos);
   } else {
-    bitmap->data[INDEX(pos)] &= ~(1 << BIT(pos));
+    bitmap->data[INDEX(pos)] &= ~BIT(pos);
   }
 }
 
@@ -34,7 +35,7 @@ bool bitmapCheck(Bitmap* bitmap, size_t pos) {
   ASSERT(bitmap != 0);
   ASSERT(pos < bitmap->bits);
 
-  return (bitmap->data[INDEX(pos)] & (1 << BIT(pos))) != 0;
+  return (bitmap->data[INDEX(pos)] & BIT(pos)) != 0;
 }
 
 void bitmapFillAll(Bitmap* bitmap, bool value) {
@@ -83,5 +84,5 @@ size_t bitmapFind(Bitmap* bitmap, size_t length) {
 }
 
 size_t bitmapCalculateSize(size_t bits) {
-  return (ALIGN_UP(bits, 64) / sizeof(u64));
+  return DIV_ROUND_UP(bits, 64) * sizeof(u64);
 }

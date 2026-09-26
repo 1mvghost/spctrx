@@ -90,7 +90,8 @@ void pmmInit() {
   for (int i = 0; i < mMapLen; i++) {
     struct limine_memmap_entry* ent = limineMMapRequest().response->entries[i];
     if (ent->base % PAGE_SIZE == 0 && ent->type == LIMINE_MEMMAP_USABLE) {
-      pmmFree(ent->base, ent->length / PAGE_SIZE);
+      bitmapFill(&pmmBitmap, ent->base / PAGE_SIZE,
+                 (ent->base + ent->length) / PAGE_SIZE, false);
     }
   }
 
