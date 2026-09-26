@@ -89,7 +89,7 @@ void ideSleep() {
     in8(ATA_REG_ALTSTATUS);
 }
 u8 ideIn8(u8 ch, u8 reg) {
-  u8 res;
+  u8 res = 0;
   if (reg > 0x07 && reg < 0x0C) {
     ideOut8(ch, ATA_REG_CONTROL, 0x80 | channels[ch].nieN);
   }

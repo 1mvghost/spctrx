@@ -19,6 +19,6 @@ void mpInit() {
   debug("mp: found %d cpus\n", m->cpu_count);
 
   for (u64 i = 0; i < m->cpu_count; i++) {
-    atomic_store(&m->cpus[i]->goto_address, &mpEntry);
+    m->cpus[i]->goto_address = mpEntry;
   }
 }

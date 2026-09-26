@@ -9,6 +9,10 @@ typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
 
+typedef uint8_t bool;
+#define true 1
+#define false 0
+
 #define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
 
 #define U64_LOW(addr) (addr & 0xffffffff)

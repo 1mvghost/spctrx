@@ -74,11 +74,11 @@ void doPanic(char* err) {
 
 void panic(char* fmt, ...) {
   va_list va;
-  va_start(va);
+  va_start(va, fmt);
 
   char buf[1024];
-  memset(buf, 0, 1024);
-  vsnprintf(buf, 1024, fmt, va);
+  memset(buf, 0, sizeof(buf));
+  vsnprintf(buf, sizeof(buf), fmt, va);
 
   doPanic(buf);
 

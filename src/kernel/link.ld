@@ -1,11 +1,12 @@
 OUTPUT_FORMAT(elf64-x86-64)
 ENTRY(main)
 
-PHDRS {
-    limine_requests PT_LOAD;
-    text PT_LOAD;
-    rodata PT_LOAD;
-    data PT_LOAD;
+PHDRS
+{
+    limine_requests PT_LOAD FLAGS(0x06); /* Read, write */
+    text PT_LOAD FLAGS(0x05); /* Read, execute */
+    rodata PT_LOAD FLAGS(0x04); /* Read */
+    data PT_LOAD FLAGS(0x06); /* Read, write */
 }
 SECTIONS {
     . = 0xffffffff80000000;

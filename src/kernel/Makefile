@@ -12,14 +12,41 @@ TMP_DIRS=$(patsubst ./%, $(BUILD)/%, $(SRC_DIRS))
 
 #Tools
 
-C=gcc #/usr/local/x86_64elfgcc/bin/x86_64-elf-gcc
-C_FLAGS=-I$(INC)/ -ffreestanding -m64 -g -nostdlib -Wall -Wextra -mcmodel=kernel -mno-red-zone -fno-common -fno-pic -fno-stack-protector
+C=clang
+C_FLAGS=\
+	-I$(INC)/ \
+	-static \
+	-pipe \
+	-g \
+	-std=gnu11 \
+	-ffreestanding \
+	-m64 \
+	-nostdlib \
+	-Wall \
+	-Wextra \
+	-Werror \
+	-mcmodel=kernel \
+	-mno-red-zone \
+	-march=x86-64 \
+	-mno-mmx \
+	-mno-sse \
+	-mno-sse2 \
+	-fno-common \
+	-fno-pic \
+	-fno-stack-protector \
+	-fno-stack-check \
+	-ffunction-sections \
+	-fdata-sections
 
-LD=ld #/usr/local/x86_64elfgcc/bin/x86_64-elf-ld
-LD_FLAGS=-T link.ld -nostdlib -z max-page-size=4096
+LD=ld.lld
+LD_FLAGS=\
+	-T link.ld \
+	-nostdlib \
+	-z max-page-size=4096
 
 ASM=nasm
-ASM_FLAGS=-f elf64
+ASM_FLAGS=\
+	-f elf64
 
 #Misc
 
