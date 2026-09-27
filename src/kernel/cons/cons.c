@@ -31,9 +31,10 @@ void consNewline() {
   }
 }
 
-Splock putcSp = ATOMIC_FLAG_INIT;
+static SPINLOCK(putcSpinlock);
 void consPutc(char ch) {
-  mSpinlockAcquire(&putcSp);
+  mSpinlockAcquire(&putcSpinlock);
+
   switch (ch) {
     case '\n':
       consNewline();
@@ -47,7 +48,8 @@ void consPutc(char ch) {
       break;
   }
   debugPutc(ch);
-  mSpinlockDrop(&putcSp);
+
+  mSpinlockDrop(&putcSpinlock);
 }
 void consInit() {
   textWidth = ALIGN_DOWN(fbResX() / 4, FWIDTH);

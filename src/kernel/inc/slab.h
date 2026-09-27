@@ -23,7 +23,7 @@ typedef struct {
   size_t objSize;
   size_t objPerSlab;
 
-  Splock lock;
+  Spinlock lock;
 } SlabCache;
 
 void* slabAlloc(SlabCache* cache);

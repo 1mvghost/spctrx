@@ -5,23 +5,24 @@
 
 #define COM1 0x3F8
 
-Splock debugSplock = ATOMIC_FLAG_INIT;
 int debugEmpty() {
   return in8(COM1 + 5) & 0x20;
 }
 
-Splock cSplock = ATOMIC_FLAG_INIT;
+static SPINLOCK(cSpinlock);
 void debugPutc(char c) {
-  mSpinlockAcquire(&cSplock);
+  mSpinlockAcquire(&cSpinlock);
   while (debugEmpty() == 0) {
   }
 
   out8(COM1, c);
-  mSpinlockDrop(&cSplock);
+  mSpinlockDrop(&cSpinlock);
 }
 
+static SPINLOCK(debugSpinlock);
 void debug(char* fmt, ...) {
-  mSpinlockAcquire(&debugSplock);
+  mSpinlockAcquire(&debugSpinlock);
+
   va_list va;
   va_start(va, fmt);
 
@@ -37,7 +38,7 @@ void debug(char* fmt, ...) {
 
   va_end(va);
 
-  mSpinlockDrop(&debugSplock);
+  mSpinlockDrop(&debugSpinlock);
 }
 
 void debugInit() {

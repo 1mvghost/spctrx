@@ -1,12 +1,15 @@
 #ifndef MEM_H
 #define MEM_H
+
 #include <stdatomic.h>
 #include <util.h>
 
-/* make stuff more readable */
-typedef atomic_flag Splock;
+typedef atomic_flag Spinlock;
 
-void mSpinlockAcquire(Splock* l);
-void mSpinlockDrop(Splock* l);
+#define SPINLOCK(name) Spinlock name = ATOMIC_FLAG_INIT
+
+void mSpinlockAcquire(Spinlock* lock);
+void mSpinlockDrop(Spinlock* lock);
+void mSpinlockInit(Spinlock* lock);
 
 #endif

@@ -117,7 +117,7 @@ struct FsFd* vfsFdAlloc(struct FsNode* n, u64 flags) {
   return fd;
 }
 
-Splock mntSplock = ATOMIC_FLAG_INIT;
+static SPINLOCK(mntSpinlock);
 
 static SlabCache mntCache;
 
@@ -129,7 +129,7 @@ void vfsMount(char* path, char* dev, char* type) {
     return;
   }
 
-  mSpinlockAcquire(&mntSplock);
+  mSpinlockAcquire(&mntSpinlock);
 
   struct FsMnt* mnt = slabAlloc(&mntCache);
 
@@ -153,7 +153,7 @@ void vfsMount(char* path, char* dev, char* type) {
 
   debug("vfs: MOUNTED %s\n", path);
 
-  mSpinlockDrop(&mntSplock);
+  mSpinlockDrop(&mntSpinlock);
 }
 
 void vfsInit() {

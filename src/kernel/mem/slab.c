@@ -121,7 +121,7 @@ void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
 
   cache->objSize = objSize;
   cache->objPerSlab = ((SLAB_SIZE_PAGES * PAGE_SIZE) - sizeof(Slab)) / objSize;
-  cache->lock = (Splock)ATOMIC_FLAG_INIT;
+  mSpinlockInit(&cache->lock);
 
   debug("slab: new cache %s (%llx) objsize:%lld objperslab:%lld\n", name, cache,
         objSize, cache->objPerSlab);
