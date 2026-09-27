@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <bitmap.h>
 #include <debug.h>
+#include <string.h>
 
 #define INDEX(pos) (pos / 64)
 #define BIT_INDEX(pos) (pos % 64)

@@ -33,8 +33,6 @@ void gdtSetDesc(u8 i, u32 limit, u32 base, u8 access, u8 flags) {
 }
 
 void gdtInit() {
-  memset(gdt, 0, sizeof(gdt));
-
   gdtr.base = gdt;
   gdtr.limit = sizeof(gdt) - 1;
 

@@ -1,6 +1,7 @@
 #include <ahci.h>
 #include <debug.h>
 #include <pmm.h>
+#include <string.h>
 #include <vmm.h>
 
 #define FIS_TYPE_REG_H2D 0x27

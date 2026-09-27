@@ -5,6 +5,7 @@
 #include <mem.h>
 #include <panic.h>
 #include <pmm.h>
+#include <string.h>
 #include <vmm.h>
 
 static Bitmap pmmBitmap;

@@ -1,5 +1,6 @@
 #include <debug.h>
 #include <dev.h>
+#include <string.h>
 #include <tmp.h>
 #include <util.h>
 #include <vfs.h>

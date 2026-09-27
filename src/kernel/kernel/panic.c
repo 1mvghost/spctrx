@@ -1,7 +1,9 @@
 #include <panic.h>
 #include <printf.h>
 #include <stdarg.h>
+#include <string.h>
 #include <util.h>
+
 static const char* exceptions[32] = {"Div By Zero",
                                      "Debug",
                                      "NMI",

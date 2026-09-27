@@ -2,6 +2,7 @@
 #include <mem.h>
 #include <printf.h>
 #include <stdarg.h>
+#include <string.h>
 
 #define COM1 0x3F8
 

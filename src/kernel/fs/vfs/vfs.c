@@ -3,6 +3,7 @@
 #include <ll.h>
 #include <mem.h>
 #include <slab.h>
+#include <string.h>
 #include <tmp.h>
 #include <vfs.h>
 #include <vmm.h>

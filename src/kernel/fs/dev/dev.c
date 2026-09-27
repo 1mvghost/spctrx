@@ -1,5 +1,6 @@
 #include <debug.h>
 #include <dev.h>
+#include <string.h>
 #include <vfs.h>
 
 struct FsNode* dirdebug;

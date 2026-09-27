@@ -5,6 +5,7 @@
 #include <panic.h>
 #include <pci.h>
 #include <pmm.h>
+#include <string.h>
 #include <vmm.h>
 
 /**

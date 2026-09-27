@@ -2,6 +2,7 @@
 #include <fb.h>
 #include <font.h>
 #include <mem.h>
+#include <string.h>
 
 static u64 curX = 0;
 static u64 curY = 0;

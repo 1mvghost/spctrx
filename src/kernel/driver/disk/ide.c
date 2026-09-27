@@ -1,5 +1,6 @@
 #include <debug.h>
 #include <ide.h>
+#include <string.h>
 #include <vmm.h>
 
 #define ATA_REG_DATA 0x00

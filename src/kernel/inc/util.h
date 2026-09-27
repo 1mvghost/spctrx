@@ -59,27 +59,6 @@ static inline void ins32(u16 port, u32* buf, int q) {
     buf[i] = in32(port);
   }
 }
-static inline void memset(void* dst, u8 value, int n) {
-  UNUSED(dst);
-  asm volatile("rep stosb" : : "a"(value), "c"(n));
-}
-static inline void* memcpy(void* dst, void* src, int n) {
-  UNUSED(src);
-  asm volatile("rep movsb" : : "c"(n));
-  return dst;
-}
-static inline void* memmove(void* dstptr, const void* srcptr, u64 size) {
-  unsigned char* dst = (unsigned char*)dstptr;
-  const unsigned char* src = (const unsigned char*)srcptr;
-  if (dst < src) {
-    for (u64 i = 0; i < size; i++)
-      dst[i] = src[i];
-  } else {
-    for (u64 i = size; i != 0; i--)
-      dst[i - 1] = src[i - 1];
-  }
-  return dstptr;
-}
 static inline u8 keypress() {
   /* doesnt work on uefi real hardware :( */
 
@@ -92,54 +71,20 @@ static inline u8 keypress() {
   }
   return in8(0x60);
 }
-static inline int memcmp(void* a, void* b, int cnt) {
-  if (!cnt)
-    return 0;
 
-  while (--cnt && *(char*)a == *(char*)b) {
-    a = (char*)a + 1;
-    b = (char*)b + 1;
-  }
-
-  return (*((u8*)a) - *((u8*)b));
-}
-static inline void wrmsr(u64 msr, u64 value) {
+static inline void wrmsr(u32 msr, u64 value) {
   u32 low = value & 0xFFFFFFFF;
   u32 high = value >> 32;
-  asm volatile("wrmsr" : : "c"(msr), "a"(low), "d"(high));
+  asm volatile("wrmsr" : : "c"(msr), "a"(low), "d"(high) : "memory");
 }
-static inline u64 rdmsr(u64 msr) {
+static inline u64 rdmsr(u32 msr) {
   u32 low, high;
+
   asm volatile("rdmsr" : "=a"(low), "=d"(high) : "c"(msr));
+
   return ((u64)high << 32) | low;
 }
-static inline int strlen(char* s) {
-  char* p = s;
-  int res = 0;
-  while (*p) {
-    res++;
-    p++;
-  }
-  return res;
-}
-
 static inline void cpuid(u32* a, u32* b, u32* c, u32* d) {
   asm volatile("cpuid" : "=b"(*b), "=c"(*c), "=d"(*d) : "a"(*a));
-}
-
-static inline int strcmp(const char* s1, const char* s2) {
-  const char* ss1 = s1;
-  const char* ss2 = s2;
-  while (*ss1 && (*ss1 == *ss2)) {
-    ss1++;
-    ss2++;
-  }
-  return *(const unsigned char*)ss1 - *(const unsigned char*)ss2;
-}
-static inline char* strcpy(char* dst, char* src) {
-  char* tmp = dst;
-  while ((*dst++ = *src++))
-    ;
-  return tmp;
 }
 #endif
