@@ -1,5 +1,5 @@
+#include <boot.h>
 #include <pmm.h>
-#include <printf.h>
 #include <vmm.h>
 
 static PageTable p4;
@@ -7,11 +7,11 @@ static PageTable p4;
 extern void vmmLoad(void* p4);
 
 void* vmmPhysToVirt(u64 phys) {
-  return (void*)(phys + 0xffff800000000000);
+  return (void*)(phys + getHHDM());
 }
 
 u64 vmmVirtToPhys(void* virt) {
-  return ((u64)virt - 0xffff800000000000);
+  return ((u64)virt - getHHDM());
 }
 
 void vmmInvalidatePage(void* virt) {

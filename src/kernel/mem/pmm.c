@@ -8,6 +8,11 @@
 #include <string.h>
 #include <vmm.h>
 
+__attribute__((
+    used,
+    section(".limine_requests"))) static volatile struct limine_memmap_request
+    mMapRequest = {.id = LIMINE_MEMMAP_REQUEST_ID, .revision = 0};
+
 static Bitmap pmmBitmap;
 static SPINLOCK(pmmSpinlock);
 
@@ -57,7 +62,11 @@ void pmmFree(u64 addr, size_t pages) {
 }
 
 void pmmInit() {
-  int mMapLen = limineMMapRequest().response->entry_count;
+  if (mMapRequest.response == 0) {
+    panic("memory map response unavailable!!\n");
+  }
+
+  int mMapLen = mMapRequest.response->entry_count;
 
   u64 last = 0;
   u64 bitmapAddr = 0;
@@ -66,7 +75,7 @@ void pmmInit() {
    * get the last usable memory address
    */
   for (int i = 0; i < mMapLen; i++) {
-    struct limine_memmap_entry* ent = limineMMapRequest().response->entries[i];
+    struct limine_memmap_entry* ent = mMapRequest.response->entries[i];
     if (ent->type == LIMINE_MEMMAP_USABLE) {
       last = ent->base + ent->length;
     }
@@ -78,7 +87,7 @@ void pmmInit() {
    * find a memory range big enough for the bitmap's data
    */
   for (int i = 0; i < mMapLen; i++) {
-    struct limine_memmap_entry* ent = limineMMapRequest().response->entries[i];
+    struct limine_memmap_entry* ent = mMapRequest.response->entries[i];
     if (ent->type == LIMINE_MEMMAP_USABLE && ent->base != 0 &&
         ent->length >= bitmapSize) {
       bitmapAddr = ent->base;
@@ -99,7 +108,7 @@ void pmmInit() {
    * mark usable pages as free
    */
   for (int i = 0; i < mMapLen; i++) {
-    struct limine_memmap_entry* ent = limineMMapRequest().response->entries[i];
+    struct limine_memmap_entry* ent = mMapRequest.response->entries[i];
     if (ent->base % PAGE_SIZE == 0 && ent->type == LIMINE_MEMMAP_USABLE) {
       bitmapFill(&pmmBitmap, ent->base / PAGE_SIZE,
                  (ent->base + ent->length) / PAGE_SIZE, false);

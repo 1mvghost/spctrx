@@ -4,6 +4,11 @@
 #include <idt.h>
 #include <stdatomic.h>
 
+__attribute__((
+    used,
+    section(".limine_requests"))) static volatile struct limine_mp_request
+    mpRequest = {.id = LIMINE_MP_REQUEST_ID, .revision = 4};
+
 void mpEntry(struct limine_mp_info* mp) {
   UNUSED(mp);
 
@@ -15,7 +20,12 @@ void mpEntry(struct limine_mp_info* mp) {
 }
 
 void mpInit() {
-  struct limine_mp_response* m = limineMpRequest().response;
+  if (mpRequest.response == 0) {
+    debug("mp: no extra cpus!\n");
+    return;
+  }
+
+  struct limine_mp_response* m = mpRequest.response;
   debug("mp: found %d cpus\n", m->cpu_count);
 
   for (u64 i = 0; i < m->cpu_count; i++) {

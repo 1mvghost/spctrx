@@ -11,6 +11,12 @@
 /**
  * TODO: uacpi
  */
+
+__attribute__((
+    used,
+    section(".limine_requests"))) static volatile struct limine_rsdp_request
+    rsdpRequest = {.id = LIMINE_RSDP_REQUEST_ID, .revision = 4};
+
 typedef struct {
   char signature[4];
   u32 length;
@@ -173,21 +179,16 @@ void acpiShutdown() {
 }
 
 void acpiInit() {
-  struct limine_rsdp_response* rsdpResponse = limineRsdpRequest().response;
-
-  u64 rsdpAddr = 0;
-
-  if (rsdpResponse) {
-    rsdpAddr = (u64)rsdpResponse->address;
+  if (rsdpRequest.response == 0 || rsdpRequest.response->address == 0) {
+    panic("acpi not found!\n");
   }
-  if (rsdpAddr == 0) {
-    debug("acpi: NOT FOUND :(\n");
-    return;
-  }
-  rsdp = (RSDP*)rsdpAddr;
+
+  rsdp = (RSDP*)rsdpRequest.response->address;
   rsdt = (RSDT*)vmmPhysToVirt(rsdp->rsdt);
+
   debug("acpi: ACPI OEM: %c%c%c%c%c%c\n", rsdp->oemId[0], rsdp->oemId[1],
         rsdp->oemId[2], rsdp->oemId[3], rsdp->oemId[4], rsdp->oemId[5]);
   debug("acpi: RSDT ADDR: %x\n", rsdp->rsdt);
+
   acpiRsdt();
 }
