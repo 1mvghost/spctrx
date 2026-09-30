@@ -170,7 +170,8 @@ void acpiReboot() {
   acpiOut(fadt->ResetReg, fadt->ResetValue);
 }
 void acpiShutdown() {
-  asm("cli");
+  disableInts();
+
   out16(fadt->PM1aControlBlock, SLP_TYPa | 1 << 13);
   if (fadt->PM1bControlBlock != 0) {
     out16(fadt->PM1bControlBlock, SLP_TYPb | 1 << 13);

@@ -51,5 +51,5 @@ void isrInit() {
   for (int i = 0; i < 32; i++) {
     idtSetDesc(i, (void*)isrStub[i], 0x8E);
   }
-  asm("sti");
+  enableInts();
 }

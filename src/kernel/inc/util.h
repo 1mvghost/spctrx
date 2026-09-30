@@ -72,6 +72,18 @@ static inline u8 keypress() {
   return in8(0x60);
 }
 
+static inline void disableInts() {
+  asm volatile("cli");
+}
+
+static inline void enableInts() {
+  asm volatile("sti");
+}
+
+static inline void halt() {
+  asm volatile("hlt");
+}
+
 static inline void wrmsr(u32 msr, u64 value) {
   u32 low = value & 0xFFFFFFFF;
   u32 high = value >> 32;

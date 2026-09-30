@@ -70,8 +70,8 @@ void doPanic(char* err) {
     stk = stk->rbp;
   }
 
-  asm("cli");
-  asm("hlt");
+  disableInts();
+  halt();
 }
 
 void panic(char* fmt, ...) {

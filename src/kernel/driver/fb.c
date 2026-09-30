@@ -29,8 +29,8 @@ void fbInit() {
     /**
      * todo: dont halt directly!
      */
-    asm("cli");
-    asm("hlt");
+    disableInts();
+    halt();
   }
   struct limine_framebuffer* fb = framebufferRequest.response->framebuffers[0];
 

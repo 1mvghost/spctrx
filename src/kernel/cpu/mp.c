@@ -12,11 +12,12 @@ __attribute__((
 void mpEntry(struct limine_mp_info* mp) {
   UNUSED(mp);
 
+  disableInts();
+
   gdtFlush();
   idtFlush();
 
-  asm("cli");
-  asm("hlt");
+  halt();
 }
 
 void mpInit() {

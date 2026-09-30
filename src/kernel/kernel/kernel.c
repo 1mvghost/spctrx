@@ -24,9 +24,10 @@ __attribute__((
     LIMINE_BASE_REVISION(4);
 
 void main() {
-  asm("cli");
+  disableInts();
+
   if (LIMINE_BASE_REVISION_SUPPORTED(limine_base_revision) == 0) {
-    asm("hlt");
+    halt();
   }
 
   debugInit();
