@@ -17,7 +17,9 @@ C_FLAGS=\
 	-I$(INC)/ \
 	-static \
 	-pipe \
+	-target x86_64-unknown-none-elf \
 	-g \
+	-O2 \
 	-std=gnu11 \
 	-ffreestanding \
 	-m64 \
@@ -28,6 +30,7 @@ C_FLAGS=\
 	-mcmodel=kernel \
 	-mno-red-zone \
 	-march=x86-64 \
+	-mabi=sysv \
 	-mno-mmx \
 	-mno-sse \
 	-mno-sse2 \
@@ -35,18 +38,25 @@ C_FLAGS=\
 	-fno-pic \
 	-fno-stack-protector \
 	-fno-stack-check \
+	-fno-lto \
 	-ffunction-sections \
 	-fdata-sections
 
 LD=ld.lld
 LD_FLAGS=\
+	-m elf_x86_64 \
 	-T link.ld \
 	-nostdlib \
-	-z max-page-size=4096
+	-static \
+	-z noexecstack \
+	-z max-page-size=4096 \
+    --gc-sections
 
 ASM=nasm
 ASM_FLAGS=\
-	-f elf64
+	-f elf64 \
+	-g \
+	-Wall
 
 #Misc
 
