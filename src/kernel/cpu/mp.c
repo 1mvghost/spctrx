@@ -1,7 +1,9 @@
+#include <apic.h>
 #include <boot.h>
 #include <debug.h>
 #include <gdt.h>
 #include <idt.h>
+#include <mem.h>
 #include <stdatomic.h>
 
 __attribute__((
@@ -9,13 +11,20 @@ __attribute__((
     section(".limine_requests"))) static volatile struct limine_mp_request
     mpRequest = {.id = LIMINE_MP_REQUEST_ID, .revision = 4};
 
+static SPINLOCK(mpInitSpinlock);
 void mpEntry(struct limine_mp_info* mp) {
   UNUSED(mp);
 
   disableInts();
 
+  mSpinlockAcquire(&mpInitSpinlock);
+
   gdtFlush();
   idtFlush();
+
+  apicInit();
+
+  mSpinlockDrop(&mpInitSpinlock);
 
   halt();
 }

@@ -1,4 +1,5 @@
 #include <acpi.h>
+#include <apic.h>
 #include <assert.h>
 #include <boot.h>
 #include <cons.h>
@@ -46,8 +47,9 @@ void main() {
   vmmInit();
 
   vfsInit();
-  pciInit();
   acpiInit();
+  apicInit();
+  pciInit();
   mpInit();
 
   test();
