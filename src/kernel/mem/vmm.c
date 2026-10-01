@@ -80,6 +80,14 @@ void vmmUnmapPages(void* virt, int n) {
   }
 }
 
+void vmmMapMMIO(u64 addr, size_t pages) {
+  vmmMapPages(vmmPhysToVirt(addr), addr, PTE_WRITABLE | PTE_NOT_CACHEABLE,
+              pages);
+}
+void vmmUnmapMMIO(u64 addr, size_t pages) {
+  vmmUnmapPages(vmmPhysToVirt(addr), pages);
+}
+
 void* vmmAlloc(size_t pages) {
   return vmmPhysToVirt(pmmAlloc(pages));
 }

@@ -333,7 +333,8 @@ void ahciInit(u64 bar5) {
     debug("ahci: more than 1 controller is not supported yet\n");
     return;
   }
-  vmmMap(vmmPhysToVirt(bar5), bar5, PTE_WRITABLE);
+  vmmMapMMIO(bar5, 1);
+
   base = (HbaMem*)vmmPhysToVirt(bar5);
   ahciEnum();
 }

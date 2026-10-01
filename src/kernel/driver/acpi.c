@@ -110,6 +110,8 @@ static int SLP_TYPb;
 
 void acpiOut(GenericAddress gAddr, u8 val) {
   if (gAddr.addrSpace == 0) {
+    vmmMapMMIO(gAddr.addr, 1);
+
     if (gAddr.accessSize <= 1)
       *((u8*)vmmPhysToVirt(gAddr.addr)) = val;
     if (gAddr.accessSize == 2)
