@@ -47,9 +47,19 @@ void isrHandler(Regs* regs) {
   panicIsr(regs);
 }
 
+void isrSpuriousInt() {
+  debug("isr: spurious interrupt!\n");
+}
+
 void isrInit() {
   for (int i = 0; i < 32; i++) {
     idtSetDesc(i, (void*)isrStub[i], 0x8E);
   }
+
+  /**
+   * spurious interrupt handler
+   */
+  idtSetDesc(255, isrSpuriousInt, 0x8E);
+
   enableInts();
 }
