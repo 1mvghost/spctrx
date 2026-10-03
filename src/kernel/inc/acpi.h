@@ -11,6 +11,19 @@ typedef struct {
   u32 rsdt;
 } __attribute__((packed)) RSDP;
 
+typedef struct {
+  char signature[4];
+  u32 length;
+  u8 revision;
+  u8 checksum;
+  char oemId[6];
+  char oemTableId[8];
+  u32 oemRevision;
+  u32 creatorId;
+  u32 creatorRevision;
+} __attribute__((packed)) SDTHeader;
+
+void* acpiFindTable(char* signature);
 void acpiInit();
 void acpiReboot();
 void acpiShutdown();

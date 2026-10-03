@@ -18,18 +18,6 @@ __attribute__((
     rsdpRequest = {.id = LIMINE_RSDP_REQUEST_ID, .revision = 4};
 
 typedef struct {
-  char signature[4];
-  u32 length;
-  u8 revision;
-  u8 checksum;
-  char oemId[6];
-  char oemTableId[8];
-  u32 oemRevision;
-  u32 creatorId;
-  u32 creatorRevision;
-} __attribute__((packed)) SDTHeader;
-
-typedef struct {
   SDTHeader h;
   u32 sdtPtr[256];
 } __attribute__((packed)) RSDT;
@@ -131,6 +119,10 @@ void acpiOut(GenericAddress gAddr, u8 val) {
   }
 }
 void acpiFadt() {
+  fadt = acpiFindTable("FACP");
+  if (fadt == 0) {
+    return;
+  }
   if (!memcmp(vmmPhysToVirt(fadt->Dsdt), "DSDT", 4)) {
     char* s5 = (char*)vmmPhysToVirt((fadt->Dsdt + 36));
     int* len = (int*)vmmPhysToVirt(((fadt->Dsdt + 1) - 36));
@@ -156,16 +148,22 @@ void acpiFadt() {
   }
 }
 
+void* acpiFindTable(char* signature) {
+  for (u32 i = 0; i < (rsdt->h.length - sizeof(rsdt->h)) / 4; i++) {
+    void* a = vmmPhysToVirt(rsdt->sdtPtr[i]);
+    SDTHeader* h = (SDTHeader*)a;
+    if (!memcmp(h->signature, signature, 4)) {
+      return a;
+    }
+  }
+  return 0;
+}
 void acpiRsdt() {
   for (u32 i = 0; i < (rsdt->h.length - sizeof(rsdt->h)) / 4; i++) {
     void* a = vmmPhysToVirt(rsdt->sdtPtr[i]);
     SDTHeader* h = (SDTHeader*)a;
     debug("acpi: FOUND TABLE: %c%c%c%c (%x)\n", h->signature[0],
           h->signature[1], h->signature[2], h->signature[3], a);
-    if (!memcmp(h->signature, "FACP", 4)) {
-      fadt = (FADT*)a;
-      acpiFadt();
-    }
   }
 }
 void acpiReboot() {
@@ -194,4 +192,6 @@ void acpiInit() {
   debug("acpi: RSDT ADDR: %x\n", rsdp->rsdt);
 
   acpiRsdt();
+
+  acpiFadt();
 }
