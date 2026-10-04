@@ -22,7 +22,7 @@ void mpEntry(struct limine_mp_info* mp) {
   gdtFlush();
   idtFlush();
 
-  apicInit();
+  apicApInit();
 
   mSpinlockDrop(&mpInitSpinlock);
 

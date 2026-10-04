@@ -23,6 +23,20 @@ typedef struct {
   u32 creatorRevision;
 } __attribute__((packed)) SDTHeader;
 
+typedef struct {
+  u8 entryType;
+  u8 entryLength;
+} __attribute__((packed)) MADTEntry;
+
+typedef struct {
+  SDTHeader header;
+
+  u32 lapic;
+  u32 flags;
+
+  MADTEntry entries[0];
+} __attribute__((packed)) MADT;
+
 void* acpiFindTable(char* signature);
 void acpiInit();
 void acpiReboot();
