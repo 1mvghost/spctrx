@@ -4,7 +4,6 @@
 #include <fb.h>
 #include <font.h>
 #include <gdt.h>
-#include <ide.h>
 #include <idt.h>
 #include <isr.h>
 #include <limine.h>
@@ -20,16 +19,6 @@
 #include <vmm.h>
 
 void test() {
-#ifdef IDE_TEST
-  printf("ide: test\n");
-  u8 buf[512];
-  memset(buf, 0, sizeof(buf));
-  ideRead(0, 0, 1, buf);
-  for (int i = 0; i < 512; i++)
-    printf("%c", buf[i]);
-
-  printf("\n");
-#endif
 #ifdef AHCI_TEST
   char buf[512];
   memset(buf, 0, sizeof(buf));

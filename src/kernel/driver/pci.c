@@ -1,6 +1,5 @@
 #include <ahci.h>
 #include <debug.h>
-#include <ide.h>
 #include <ll.h>
 #include <pci.h>
 #include <slab.h>
@@ -80,11 +79,8 @@ u8 pciIn8Low(u32 bus, u32 dev, u32 func, u32 offset) {
   u16 tmp = pciIn16(bus, dev, func, offset);
   return (u8)(tmp & 0xFF);
 }
+
 void pciHandle(PCIDevice* dev) {
-  if (dev->classcode == 1 && dev->subclass == 1) {
-    /* IDE */
-    ideInit(dev->bar0, dev->bar1, dev->bar2, dev->bar3, dev->bar4);
-  }
   if (dev->classcode == 1 && dev->subclass == 6) {
     /* AHCI */
     ahciInit(dev->bar5);
