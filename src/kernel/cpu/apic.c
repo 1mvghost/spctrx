@@ -12,7 +12,10 @@
 #define IA32_APIC_BASE_MSR_ENABLE 0x800
 
 static LLHead ioApics;
+static LLHead ioApicOverrides;
+
 static SlabCache ioApicCache;
+static SlabCache ioApicOverrideCache;
 
 bool apicCheckSupport() {
   u32 eax = 1, ebx, ecx, edx;
@@ -78,10 +81,7 @@ void apicInitIoApic(int id, u64 ioAddr, int baseGsi) {
         ioApic->ioAddr, ioApic->gsiStart, ioApic->gsiEnd);
 }
 
-void apicFindIoApics() {
-  /**
-   * todo: check for io apic overrides
-   */
+void apicParseMadt() {
   MADT* madt = acpiFindTable("APIC");
 
   if (madt == 0) {
@@ -95,11 +95,30 @@ void apicFindIoApics() {
     MADTEntry* ent = (MADTEntry*)ptr;
 
     if (ent->entryType == 1) {
+      /**
+       * init io apic
+       */
       u8 id = *(u8*)(ptr + 2);
       u32 addr = *(u32*)(ptr + 4);
       u32 gsi = *(u32*)(ptr + 8);
 
       apicInitIoApic(id, addr, gsi);
+    } else if (ent->entryType == 2) {
+      /**
+       * init io apic override (isa -> gsi)
+       */
+      IOAPICOverride* override = slabAlloc(&ioApicOverrideCache);
+
+      override->bus = *(u8*)(ptr + 2);
+      override->isaSource = *(u8*)(ptr + 3);
+      override->gsi = *(u32*)(ptr + 4);
+      override->flags = *(u16*)(ptr + 8);
+      llInitHead(&override->head);
+
+      llInsertFront(&ioApicOverrides, &override->head);
+
+      debug("ioapic: new override for isa %d -> gsi %d flags %x\n",
+            override->isaSource, override->gsi, override->flags);
     }
 
     ptr += ent->entryLength;
@@ -128,9 +147,13 @@ void apicInit() {
     panic("apic is not supported!\n");
   }
 
-  slabInitCache(&ioApicCache, "io apic object cache", sizeof(IOAPIC));
+  slabInitCache(&ioApicCache, "io apics", sizeof(IOAPIC));
+  slabInitCache(&ioApicOverrideCache, "io apic overrides",
+                sizeof(IOAPICOverride));
+
   llInitHead(&ioApics);
+  llInitHead(&ioApicOverrides);
 
   apicApInit();
-  apicFindIoApics();
+  apicParseMadt();
 }
