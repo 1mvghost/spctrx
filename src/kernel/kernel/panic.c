@@ -36,17 +36,20 @@ static const char* exceptions[32] = {"Div By Zero",
                                      "Unknown"};
 
 void panicIsr(Regs* regs) {
-  printf("%s\n", exceptions[regs->intId]);
-  printf("STOP:%x INT:%x\n", regs->errId, regs->intId);
-  printf("RAX:%llx RBX:%llx RCX:%llx RDX:%llx RSP:%llx RDI:%llx RSI:%llx\n",
-         regs->rax, regs->rbx, regs->rcx, regs->rdx, regs->rsp, regs->rdi,
-         regs->rsi);
-  printf(
-      "R8:%llx R9:ll%x R10:%llx R11:%llx R12:%llx R13:%llx R14:%llx R15:%llx\n",
-      regs->r8, regs->r9, regs->r10, regs->r11, regs->r12, regs->r13, regs->r14,
-      regs->r15);
-  printf("RIP:%llx CS:%llx RFLAGS:%llx\n", regs->rip, regs->cs, regs->rFlags);
-  printf("SS:%llx KRSP:%llx\n", regs->ss, regs->kRsp);
+  printf("panic: kernel exception!\n");
+  printf("panic: %s\n", exceptions[regs->intId]);
+  printf("panic: err %016llx int %016llx\n", regs->errId, regs->intId);
+  printf("panic: rax %016llx r8  %016llx\n", regs->rax, regs->r8);
+  printf("panic: rbx %016llx r9  %016llx\n", regs->rbx, regs->r9);
+  printf("panic: rcx %016llx r10 %016llx\n", regs->rcx, regs->r10);
+  printf("panic: rdx %016llx r11 %016llx\n", regs->rdx, regs->r11);
+  printf("panic: rsi %016llx r12 %016llx\n", regs->rsi, regs->r12);
+  printf("panic: rdi %016llx r13 %016llx\n", regs->rdi, regs->r13);
+  printf("panic: rsp %016llx r14 %016llx\n", regs->rsp, regs->r14);
+  printf("panic: rip %016llx r15 %016llx\n", regs->rip, regs->r15);
+  printf("panic: rfl %016llx\n", regs->rFlags);
+  printf("panic: cs  %016llx ss  %016llx\n", regs->cs, regs->ss);
+  printf("panic: kRsp %016llx\n", regs->kRsp);
   panic("");
 }
 
@@ -56,9 +59,9 @@ void doPanic(char* err) {
   u32 cpuId = (ebx >> 24) & 0xFF;
 
   if (*err != '\0')
-    printf("%s", err);
-  printf("CPU: %d\n", cpuId);
-  printf("--- Kernel Call Trace ---\n");
+    printf("panic: %s", err);
+  printf("panic: caused by cpu%d\n", cpuId);
+  printf("panic: --- Kernel Call Trace ---\n");
 
   struct Stacktrace* stk;
   asm("movq %%rbp,%0" : "=r"(stk)::);
@@ -66,10 +69,11 @@ void doPanic(char* err) {
   for (u64 fr = 0; stk && fr < 10; ++fr) {
     if (stk->rip == 0)
       break;
-    printf("%llx\n", stk->rip);
+    printf("panic: %llx\n", stk->rip);
     stk = stk->rbp;
   }
 
+  printf("panic: call trace end, everything halted!\n");
   disableInts();
   halt();
 }
