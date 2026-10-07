@@ -66,22 +66,18 @@ size_t bitmapFind(Bitmap* bitmap, size_t length) {
   size_t start = 0;
   size_t current = 0;
 
-  for (size_t pos = 1; pos < bitmap->bits; pos++) {
+  for (size_t pos = 0; pos < bitmap->bits; pos++) {
     if (!bitmapCheck(bitmap, pos)) {
-      if (start == 0) {
-        start = pos;
-      }
       current++;
+      if (current == length) {
+        return start;
+      }
     } else {
-      start = 0;
+      start = pos + 1;
       current = 0;
     }
-
-    if (current == length) {
-      break;
-    }
   }
-  return start;
+  return 0;
 }
 
 size_t bitmapCalculateSize(size_t bits) {

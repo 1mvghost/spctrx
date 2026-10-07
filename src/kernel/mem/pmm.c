@@ -122,4 +122,6 @@ void pmmInit() {
   size_t bitmapEndPage = bitmapStartPage + DIV_ROUND_UP(bitmapSize, PAGE_SIZE);
 
   bitmapFill(&pmmBitmap, bitmapStartPage, bitmapEndPage, true);
+
+  bitmapSet(&pmmBitmap, 0, true);
 }

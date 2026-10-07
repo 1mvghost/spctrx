@@ -8,7 +8,7 @@ typedef struct {
   int gsiStart;
   int gsiEnd;
   int id;
-  
+
   LLHead head;
 } IOAPIC;
 
