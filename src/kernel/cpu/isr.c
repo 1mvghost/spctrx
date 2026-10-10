@@ -1,5 +1,6 @@
 #include <debug.h>
 #include <idt.h>
+#include <irq.h>
 #include <isr.h>
 #include <mem.h>
 #include <panic.h>
@@ -44,7 +45,11 @@ static void (*isrStub[32])(Regs*) = {
     isr22, isr23, isr24, isr25, isr26, isr27, isr28, isr29, isr30, isr31};
 
 void isrHandler(Regs* regs) {
-  panicIsr(regs);
+  if (regs->intId < 32) {
+    panicIsr(regs);
+  } else {
+    irqHandle(regs->intId - 32);
+  }
 }
 
 void isrSpuriousInt() {
