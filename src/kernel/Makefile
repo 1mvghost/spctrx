@@ -55,8 +55,7 @@ LD_FLAGS=\
 ASM=nasm
 ASM_FLAGS=\
 	-f elf64 \
-	-g \
-	-Wall
+	-g
 
 #Misc
 
