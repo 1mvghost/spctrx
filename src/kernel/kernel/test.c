@@ -2,7 +2,6 @@
 #include <ahci.h>
 #include <debug.h>
 #include <fb.h>
-#include <font.h>
 #include <gdt.h>
 #include <idt.h>
 #include <isr.h>
