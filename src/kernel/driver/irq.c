@@ -1,7 +1,6 @@
 #include <bitmap.h>
 #include <debug.h>
 #include <irq.h>
-#include <string.h>
 #include <vmm.h>
 
 /**
@@ -27,7 +26,11 @@ int irqAllocVector() {
 }
 
 void irqInstall(int vector, void* handler) {
-  handlers[vector - 32] = handler;
+  vector -= 32;
+
+  handlers[vector] = handler;
+
+  bitmapSet(&irqBitmap, vector, true);
 }
 
 void irqInit() {

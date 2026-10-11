@@ -7,6 +7,7 @@
 #include <fb.h>
 #include <gdt.h>
 #include <idt.h>
+#include <irq.h>
 #include <isr.h>
 #include <limine.h>
 #include <mp.h>
@@ -46,6 +47,7 @@ void main() {
   pmmInit();
   vmmInit();
 
+  irqInit();
   vfsInit();
   acpiInit();
   apicInit();
