@@ -1,35 +1,25 @@
 .PHONY: all clean kernel limine iso
 
 #Dirs
-SRC=src
-BUILD=build
+KERNEL=kernel
 ISO=iso
 LIMINE=limine
 TOOLS=tools
 
-KERNEL_SRC=$(SRC)/kernel
-
 #Misc
 KERNEL_BUILD=kernel.sys
-ISO_BUILD	=$(BUILD)/os.iso
+ISO_BUILD	=os.iso
 LIMINE_VER	=v11.x
 
-#Tools
-FORMAT=clang-format
+all: clean kernel limine iso
 
-all: clean format kernel limine iso
-
-$(BUILD):
-	@mkdir -p $(BUILD)
-
-kernel: $(BUILD)
-	@make -C $(KERNEL_SRC) BUILD=$(abspath $(BUILD)) KERNEL_BUILD=$(abspath $(KERNEL_BUILD)) all
+kernel:
+	@make -C $(KERNEL) KERNEL_BUILD=$(abspath $(KERNEL_BUILD)) all
 
 limine:
-    @git clone https://codeberg.org/Limine/limine.git --branch=$(LIMINE_VER)-binary --depth=1 2>/dev/null
 	@make -C $(LIMINE) all
 
-iso: $(BUILD)
+iso:
 	@mkdir -p $(ISO)/boot/limine/ $(ISO)/EFI/BOOT
 
 	@cp $(LIMINE)/limine-bios-cd.bin $(LIMINE)/limine-bios.sys $(LIMINE)/limine-uefi-cd.bin $(ISO)/boot/limine/
@@ -48,8 +38,5 @@ iso: $(BUILD)
 
 	@echo "*** iso ready: $(ISO_BUILD)"
 
-format:
-	@find $(SRC) -regex '.*\.\(c\|h\)' ! -name "*limine*" ! -name "*printf*" -exec $(FORMAT) -style=file -i {} \;
-
 clean:
-	rm -rf $(BUILD) $(ISO) $(KERNEL_BUILD)
+	rm -rf $(ISO_BUILD) $(ISO) $(KERNEL_BUILD)

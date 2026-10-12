@@ -1,11 +1,12 @@
-.PHONY: all tmp
+.PHONY: all createTmpDirs format clean
 
-#Dirs
-
-BUILD?=./build
 KERNEL_BUILD?=./
 
-INC=inc
+#Dirs
+KERNEL_SRC=src
+
+BUILD=build
+INC=$(KERNEL_SRC)/inc
 
 SRC_DIRS=$(shell find ./* -type d)
 TMP_DIRS=$(patsubst ./%, $(BUILD)/%, $(SRC_DIRS))
@@ -57,6 +58,8 @@ ASM_FLAGS=\
 	-f elf64 \
 	-g
 
+FORMAT=clang-format
+
 #Misc
 
 ASM_SOURCE=$(shell find . -name "*.asm")
@@ -65,10 +68,10 @@ ASM_OBJ=$(patsubst ./%.asm, $(BUILD)/%.asm.o, $(ASM_SOURCE))
 C_SOURCE=$(shell find . -name "*.c")
 C_OBJ=$(patsubst ./%.c, $(BUILD)/%.c.o, $(C_SOURCE))
 
-tmp: 
-	@mkdir -p $(TMP_DIRS) # create all tmp dirs
+createTmpDirs: 
+	@mkdir -p $(TMP_DIRS)
 
-all: tmp $(KERNEL_BUILD)
+all: clean createTmpDirs format $(KERNEL_BUILD)
 
 $(BUILD)/%.asm.o: %.asm
 	@echo "* asm: $<"
@@ -80,3 +83,9 @@ $(BUILD)/%.c.o: %.c
 
 $(KERNEL_BUILD): $(ASM_OBJ) $(C_OBJ)
 	@$(LD) -o $@ $^ $(LD_FLAGS)
+
+format:
+	@find $(KERNEL_SRC) -regex '.*\.\(c\|h\)' ! -name "*limine*" ! -name "*printf*" -exec $(FORMAT) -style=file -i {} \;
+
+clean:
+	rm -rf $(BUILD)
