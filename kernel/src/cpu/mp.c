@@ -1,8 +1,8 @@
-#include <apic.h>
 #include <boot.h>
 #include <debug.h>
 #include <gdt.h>
 #include <idt.h>
+#include <lapic.h>
 #include <mem.h>
 #include <stdatomic.h>
 
@@ -19,7 +19,7 @@ void mpEntry(struct limine_mp_info* mp) {
   gdtFlush();
   idtFlush();
 
-  apicApInit();
+  lapicInit();
 
   halt();
 }
