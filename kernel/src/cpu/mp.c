@@ -11,20 +11,15 @@ __attribute__((
     section(".limine_requests"))) static volatile struct limine_mp_request
     mpRequest = {.id = LIMINE_MP_REQUEST_ID, .revision = 4};
 
-static SPINLOCK(mpInitSpinlock);
 void mpEntry(struct limine_mp_info* mp) {
   UNUSED(mp);
 
   disableInts();
 
-  mSpinlockAcquire(&mpInitSpinlock);
-
   gdtFlush();
   idtFlush();
 
   apicApInit();
-
-  mSpinlockDrop(&mpInitSpinlock);
 
   halt();
 }
