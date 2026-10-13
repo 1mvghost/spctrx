@@ -1,8 +1,8 @@
 #include <debug.h>
 #include <fb.h>
 
-#include "flanterm.h"
-#include "flanterm_backends/fb.h"
+#include <flanterm.h>
+#include <flanterm_backends/fb.h>
 
 #define FONT_WIDTH 8
 #define FONT_HEIGHT 16

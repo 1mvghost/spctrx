@@ -3,6 +3,7 @@
 KERNEL_BUILD?=./
 
 #Dirs
+LIBS=libs
 KERNEL_SRC=src
 
 BUILD=build
@@ -16,6 +17,7 @@ TMP_DIRS=$(patsubst ./%, $(BUILD)/%, $(SRC_DIRS))
 C=clang
 C_FLAGS=\
 	-I$(INC)/ \
+	-I$(LIBS)/flanterm/src/ \
 	-static \
 	-pipe \
 	-target x86_64-unknown-none-elf \
