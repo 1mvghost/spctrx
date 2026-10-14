@@ -34,6 +34,10 @@ u32 lapicReadReg(u32 reg) {
   return *ptr;
 }
 
+void lapicSendEOI() {
+  lapicWriteReg(0xb0, 0);
+}
+
 void lapicInit() {
   vmmMapMMIO(lapicGetBase(), 1);
 

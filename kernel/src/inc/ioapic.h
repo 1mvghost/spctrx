@@ -19,8 +19,10 @@ typedef struct {
   int flags;
 
   LLHead head;
-} IOAPICOverride;
+} ISAOverride;
 
+void ioApicMap(int gsi, int vector, u16 polarity, u16 trigger);
+void ioApicMapISA(int isa, int vector);
 void ioApicInit();
 
 #endif

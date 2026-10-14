@@ -4,7 +4,10 @@
 #include <fb.h>
 #include <gdt.h>
 #include <idt.h>
+#include <ioapic.h>
+#include <irq.h>
 #include <isr.h>
+#include <lapic.h>
 #include <limine.h>
 #include <ll.h>
 #include <mem.h>
@@ -16,6 +19,11 @@
 #include <string.h>
 #include <util.h>
 #include <vmm.h>
+
+void tick() {
+  printf("timer tick!\n");
+  lapicSendEOI();
+}
 
 void test() {
 #ifdef AHCI_TEST
@@ -95,5 +103,16 @@ void test() {
   vmmUnmap(0);
   printf("unmapped\n");
   printf("%c\n", *((char*)0));
+#endif
+#define APIC_TEST
+#ifdef APIC_TEST
+  int vector = irqAllocVector();
+
+  irqInstall(vector, tick);
+
+  /**
+   * pit timer
+   */
+  ioApicMapISA(0, vector);
 #endif
 }

@@ -56,6 +56,8 @@ void main() {
 
   test();
 
+  enableInts();
+
   keypress();
   acpiReboot();
 
