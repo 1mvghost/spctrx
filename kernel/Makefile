@@ -7,7 +7,7 @@ LIBS=libs
 KERNEL_SRC=src
 
 BUILD=build
-INC=$(KERNEL_SRC)/inc
+INCLUDE=$(KERNEL_SRC)/include
 
 SRC_DIRS=$(shell find ./* -type d)
 TMP_DIRS=$(patsubst ./%, $(BUILD)/%, $(SRC_DIRS))
@@ -16,7 +16,7 @@ TMP_DIRS=$(patsubst ./%, $(BUILD)/%, $(SRC_DIRS))
 
 C=clang
 C_FLAGS=\
-	-I$(INC)/ \
+	-I$(INCLUDE)/ \
 	-I$(LIBS)/flanterm/src/ \
 	-static \
 	-pipe \
