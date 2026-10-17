@@ -20,7 +20,7 @@ void slabAllocSlab(SlabCache* cache) {
    */
   Slab* header = (Slab*)slab;
 
-  header->start = header + 1;
+  header->start = (char*)(header + 1);
   header->firstFree = header->start;
   llInitHead(&header->head);
   header->usedObj = 0;

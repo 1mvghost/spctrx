@@ -10,7 +10,7 @@
 
 #define LL_TRAVERSE(curr, head) \
   for (curr = (head)->next; curr != head; curr = curr->next)
-;
+
 typedef struct _LLHead {
   struct _LLHead *prev, *next;
 } LLHead;

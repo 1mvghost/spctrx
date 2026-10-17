@@ -5,7 +5,7 @@
 
 void irqHandle(int irq);
 int irqAllocVector();
-void irqInstall(int vector, void* handler);
+void irqInstall(int vector, void (*handler)());
 void irqInit();
 
 #endif

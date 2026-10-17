@@ -124,15 +124,19 @@ void acpiFadt() {
     return;
   }
   if (!memcmp(vmmPhysToVirt(fadt->Dsdt), "DSDT", 4)) {
+    SDTHeader* dsdt = (SDTHeader*)vmmPhysToVirt(fadt->Dsdt);
     char* s5 = (char*)vmmPhysToVirt((fadt->Dsdt + 36));
-    int* len = (int*)vmmPhysToVirt(((fadt->Dsdt + 1) - 36));
-    while (len-- > 0) {
-      if (!memcmp(s5, "_S5_", 3)) {
+
+    bool found = false;
+
+    for (u32 i = 0; i < dsdt->length; i++) {
+      if (!memcmp(s5, "_S5", 3)) {
+        found = true;
         break;
       }
       s5++;
     }
-    if (len > 0) {
+    if (found) {
       s5 += 5;
       s5 += ((*s5 & 0xc0) >> 6) + 2;
       if (*s5 == 0x0A)

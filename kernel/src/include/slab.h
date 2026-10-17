@@ -5,8 +5,8 @@
 #include <spinlock.h>
 
 typedef struct {
-  void* start;
-  void* firstFree;
+  char* start;
+  char* firstFree;
 
   LLHead head;
 

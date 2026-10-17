@@ -22,7 +22,7 @@ u32 ioApicReadReg(IOAPIC* ioApic, u32 reg) {
   return *(u32 volatile*)(ioApic->ioAddr + 0x10);
 }
 
-void ioApicAdd(int id, u64 ioAddr, int baseGsi) {
+void ioApicAdd(int id, u64 ioAddr, u32 baseGsi) {
   IOAPIC* ioApic = slabAlloc(&ioApicCache);
 
   vmmMapMMIO(ioAddr, 1);
@@ -100,7 +100,7 @@ void ioApicWriteRedirEntry(IOAPIC* ioApic,
   u32 high = 0;
 
   low |= vector;
-  low |= (delivery & 0b11) << 7;
+  low |= (delivery & 0x3) << 7;
   low |= (destinationMode & 1) << 10;
   low |= (deliveryStatus & 1) << 11;
   low |= (polarity & 1) << 12;
@@ -115,7 +115,7 @@ void ioApicWriteRedirEntry(IOAPIC* ioApic,
   ioApicWriteReg(ioApic, pos + 1, high);
 }
 
-IOAPIC* ioApicFindForGSI(int gsi) {
+IOAPIC* ioApicFindForGSI(u32 gsi) {
   LLHead* curr;
 
   LL_TRAVERSE(curr, &ioApics) {
@@ -128,7 +128,7 @@ IOAPIC* ioApicFindForGSI(int gsi) {
   return 0;
 }
 
-void ioApicMap(int gsi, int vector, u16 polarity, u16 trigger) {
+void ioApicMap(u32 gsi, int vector, u16 polarity, u16 trigger) {
   IOAPIC* ioApic = ioApicFindForGSI(gsi);
 
   if (ioApic == 0) {
@@ -141,7 +141,7 @@ void ioApicMap(int gsi, int vector, u16 polarity, u16 trigger) {
 }
 
 void ioApicMapISA(int isa, int vector) {
-  int gsi = isa;
+  u32 gsi = isa;
 
   u16 polarity = 0;
   u16 trigger = 0;
@@ -157,8 +157,8 @@ void ioApicMapISA(int isa, int vector) {
     if (currOverride->isaSource == isa) {
       gsi = currOverride->gsi;
 
-      polarity = *(u16*)(&currOverride->flags);
-      trigger = *(u16*)(&currOverride->flags + 2);
+      polarity = (currOverride->flags & 0x3);
+      trigger = ((currOverride->flags >> 2) & 0x3);
 
       break;
     }

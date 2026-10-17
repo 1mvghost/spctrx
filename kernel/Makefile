@@ -37,6 +37,8 @@ CC_FLAGS=\
 	-nostdlib \
 	-Wall \
 	-Wextra \
+	-Wpedantic \
+	-Werror \
 	-mcmodel=kernel \
 	-mno-red-zone \
 	-march=x86-64 \

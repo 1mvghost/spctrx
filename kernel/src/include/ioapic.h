@@ -4,9 +4,9 @@
 #include <ll.h>
 
 typedef struct {
-  void* ioAddr;
-  int gsiStart;
-  int gsiEnd;
+  char* ioAddr;
+  u32 gsiStart;
+  u32 gsiEnd;
   int id;
 
   LLHead head;
@@ -15,13 +15,13 @@ typedef struct {
 typedef struct {
   int bus;
   int isaSource;
-  int gsi;
-  int flags;
+  u32 gsi;
+  u16 flags;
 
   LLHead head;
 } ISAOverride;
 
-void ioApicMap(int gsi, int vector, u16 polarity, u16 trigger);
+void ioApicMap(u32 gsi, int vector, u16 polarity, u16 trigger);
 void ioApicMapISA(int isa, int vector);
 void ioApicInit();
 

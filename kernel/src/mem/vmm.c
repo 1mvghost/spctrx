@@ -62,9 +62,10 @@ void vmmMap(void* virt, u64 phys, int flags) {
 }
 
 void vmmMapPages(void* virt, u64 phys, int flags, int n) {
+  char* currVirt = virt;
   while (n--) {
-    vmmMap(virt, phys, flags);
-    virt += PAGE_SIZE, phys += PAGE_SIZE;
+    vmmMap(currVirt, phys, flags);
+    currVirt += PAGE_SIZE, phys += PAGE_SIZE;
   }
 }
 
@@ -79,9 +80,10 @@ void vmmUnmap(void* virt) {
 }
 
 void vmmUnmapPages(void* virt, int n) {
+  char* curr = virt;
   while (n--) {
-    vmmUnmap(virt);
-    virt += PAGE_SIZE;
+    vmmUnmap(curr);
+    curr += PAGE_SIZE;
   }
 }
 

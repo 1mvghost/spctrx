@@ -4,9 +4,9 @@
 #include <vmm.h>
 
 /**
- * don't count the exceptions and the spurious interrupt
+ * don't count the exceptions
  */
-#define IRQ_HANDLERS (256 - 32 - 1)
+#define IRQ_HANDLERS (256 - 32)
 
 static void (*handlers[IRQ_HANDLERS])();
 static Bitmap irqBitmap;
@@ -25,7 +25,7 @@ int irqAllocVector() {
   return vector + 32;
 }
 
-void irqInstall(int vector, void* handler) {
+void irqInstall(int vector, void (*handler)()) {
   vector -= 32;
 
   handlers[vector] = handler;
@@ -33,6 +33,12 @@ void irqInstall(int vector, void* handler) {
   bitmapSet(&irqBitmap, vector, true);
 }
 
+void irqHandleSpurious() {
+  debug("irq: spurious interrupt!\n");
+}
+
 void irqInit() {
   bitmapInit(&irqBitmap, IRQ_HANDLERS, vmmAlloc(1));
+
+  irqInstall(255, irqHandleSpurious);
 }

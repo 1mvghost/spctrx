@@ -4,7 +4,7 @@
 #include <isr.h>
 #include <panic.h>
 
-extern u64 isrStub[255];
+extern u64 isrStub[256];
 
 void isrHandler(Regs* regs) {
   if (regs->intId < 32) {
@@ -14,17 +14,8 @@ void isrHandler(Regs* regs) {
   }
 }
 
-void isrSpuriousInt() {
-  debug("isr: spurious interrupt!\n");
-}
-
 void isrInit() {
-  for (int i = 0; i < 255; i++) {
+  for (int i = 0; i < 256; i++) {
     idtSetDesc(i, (void*)isrStub[i], 0x8E);
   }
-
-  /**
-   * spurious interrupt handler
-   */
-  idtSetDesc(255, isrSpuriousInt, 0x8E);
 }

@@ -34,7 +34,7 @@ typedef struct {
   u32 lapic;
   u32 flags;
 
-  MADTEntry entries[0];
+  MADTEntry entries[1];
 } __attribute__((packed)) MADT;
 
 void* acpiFindTable(char* signature);
