@@ -1,15 +1,16 @@
 .PHONY: all clean kernel limine iso
 
-#Dirs
+# dirs
+
 KERNEL=kernel
 ISO=iso
 LIMINE=limine
 TOOLS=tools
 
-#Misc
+# misc
+
 KERNEL_BUILD=kernel.sys
-ISO_BUILD	=os.iso
-LIMINE_VER	=v11.x
+ISO_BUILD=os.iso
 
 all: clean kernel limine iso
 
@@ -39,4 +40,4 @@ iso:
 	@echo "*** iso ready: $(ISO_BUILD)"
 
 clean:
-	rm -rf $(ISO_BUILD) $(ISO) $(KERNEL_BUILD)
+	rm -rf $(ISO_BUILD) $(ISO)

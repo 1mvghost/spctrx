@@ -2,25 +2,33 @@
 
 KERNEL_BUILD?=./
 
-#Dirs
+# dirs
+
 LIBS=libs
-KERNEL_SRC=src
-
+SRC=src
 BUILD=build
-INCLUDE=$(KERNEL_SRC)/include
 
-SRC_DIRS=$(shell find ./* -type d)
-TMP_DIRS=$(patsubst ./%, $(BUILD)/%, $(SRC_DIRS))
+INCLUDE=$(SRC)/include
 
-#Tools
+SRC_DIRS=$(shell find $(LIBS) $(SRC) -type d)
+TMP_DIRS=$(patsubst %, $(BUILD)/%, $(SRC_DIRS))
 
-C=clang
-C_FLAGS=\
+# tools
+
+TOOLCHAIN=x86_64-elf
+
+CC=$(TOOLCHAIN)-gcc
+LD=$(TOOLCHAIN)-ld
+ASM=nasm
+FORMAT=clang-format
+
+# flags
+
+CC_FLAGS=\
 	-I$(INCLUDE)/ \
 	-I$(LIBS)/flanterm/src/ \
 	-static \
 	-pipe \
-	-target x86_64-unknown-none-elf \
 	-g \
 	-O2 \
 	-std=gnu11 \
@@ -29,7 +37,6 @@ C_FLAGS=\
 	-nostdlib \
 	-Wall \
 	-Wextra \
-	-Werror \
 	-mcmodel=kernel \
 	-mno-red-zone \
 	-march=x86-64 \
@@ -45,7 +52,6 @@ C_FLAGS=\
 	-ffunction-sections \
 	-fdata-sections
 
-LD=ld.lld
 LD_FLAGS=\
 	-m elf_x86_64 \
 	-T link.ld \
@@ -55,35 +61,33 @@ LD_FLAGS=\
 	-z max-page-size=4096 \
     --gc-sections
 
-ASM=nasm
 ASM_FLAGS=\
 	-f elf64 \
 	-g
 
-FORMAT=clang-format
+# misc
 
-#Misc
+ASM_SOURCE=$(shell find $(LIBS) $(SRC) -name "*.asm")
+ASM_OBJ=$(patsubst %.asm, $(BUILD)/%.asm.o, $(ASM_SOURCE))
 
-ASM_SOURCE=$(shell find . -name "*.asm")
-ASM_OBJ=$(patsubst ./%.asm, $(BUILD)/%.asm.o, $(ASM_SOURCE))
+C_SOURCE=$(shell find $(LIBS) $(SRC) -name "*.c")
+C_OBJ=$(patsubst %.c, $(BUILD)/%.c.o, $(C_SOURCE))
 
-C_SOURCE=$(shell find . -name "*.c")
-C_OBJ=$(patsubst ./%.c, $(BUILD)/%.c.o, $(C_SOURCE))
+all: clean createTmpDirs format $(KERNEL_BUILD)
 
 createTmpDirs: 
 	@mkdir -p $(TMP_DIRS)
 
-all: clean createTmpDirs format $(KERNEL_BUILD)
-
 $(BUILD)/%.asm.o: %.asm
-	@echo "* asm: $<"
+	@echo "* ASM: $<"
 	@$(ASM) $(ASM_FLAGS) $< -o $@
 
 $(BUILD)/%.c.o: %.c
-	@echo "* c:   $<"
-	@$(C) $(C_FLAGS) $< -o $@ -c
+	@echo "* CC:  $<"
+	@$(CC) $(CC_FLAGS) $< -o $@ -c
 
 $(KERNEL_BUILD): $(ASM_OBJ) $(C_OBJ)
+	@echo "* LD"
 	@$(LD) -o $@ $^ $(LD_FLAGS)
 
 format:
@@ -91,3 +95,4 @@ format:
 
 clean:
 	rm -rf $(BUILD)
+	rm -rf $(KERNEL_BUILD)
