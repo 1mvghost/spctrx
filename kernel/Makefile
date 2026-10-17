@@ -91,7 +91,7 @@ $(KERNEL_BUILD): $(ASM_OBJ) $(C_OBJ)
 	@$(LD) -o $@ $^ $(LD_FLAGS)
 
 format:
-	@find $(KERNEL_SRC) -regex '.*\.\(c\|h\)' ! -name "*limine*" ! -name "*printf*" -exec $(FORMAT) -style=file -i {} \;
+	@find $(SRC) -regex '.*\.\(c\|h\)' ! -name "*limine*" ! -name "*printf*" -exec $(FORMAT) -style=file -i {} \;
 
 clean:
 	rm -rf $(BUILD)
