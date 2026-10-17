@@ -1,6 +1,6 @@
 #include <boot.h>
-#include <mem.h>
 #include <pmm.h>
+#include <spinlock.h>
 #include <vmm.h>
 
 static PageTable p4;
@@ -28,7 +28,7 @@ PageTable vmmGetPageTable(PageEntry ent) {
 
 static SPINLOCK(walkSpinlock);
 PageTable vmmWalk(void* virt, bool allocate, int allocFlags) {
-  mSpinlockAcquire(&walkSpinlock);
+  spinlockAcquire(&walkSpinlock);
 
   int p4Idx = P4(virt);
   int p3Idx = P3(virt);
@@ -49,7 +49,7 @@ PageTable vmmWalk(void* virt, bool allocate, int allocFlags) {
   }
   PageTable p1 = vmmGetPageTable(p2[p2Idx]);
 
-  mSpinlockDrop(&walkSpinlock);
+  spinlockDrop(&walkSpinlock);
   return p1;
 }
 

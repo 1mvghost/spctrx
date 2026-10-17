@@ -2,9 +2,9 @@
 #include <bitmap.h>
 #include <boot.h>
 #include <debug.h>
-#include <mem.h>
 #include <panic.h>
 #include <pmm.h>
+#include <spinlock.h>
 #include <string.h>
 #include <vmm.h>
 
@@ -23,7 +23,7 @@ void pmmHandleOOM() {
 u64 pmmAlloc(size_t pages) {
   ASSERT(pages > 0);
 
-  mSpinlockAcquire(&pmmSpinlock);
+  spinlockAcquire(&pmmSpinlock);
 
   u64 found = bitmapFind(&pmmBitmap, pages);
 
@@ -36,7 +36,7 @@ u64 pmmAlloc(size_t pages) {
 
   debug("pmm: allocated page at %llx\n", found * PAGE_SIZE);
 
-  mSpinlockDrop(&pmmSpinlock);
+  spinlockDrop(&pmmSpinlock);
   return found * PAGE_SIZE;
 }
 
@@ -53,12 +53,12 @@ void pmmFree(u64 addr, size_t pages) {
   ASSERT(addr != 0);
   ASSERT(pages > 0);
 
-  mSpinlockAcquire(&pmmSpinlock);
+  spinlockAcquire(&pmmSpinlock);
 
   size_t page = addr / PAGE_SIZE;
   bitmapFill(&pmmBitmap, page, page + pages, false);
 
-  mSpinlockDrop(&pmmSpinlock);
+  spinlockDrop(&pmmSpinlock);
 }
 
 void pmmInit() {

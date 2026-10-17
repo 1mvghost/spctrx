@@ -1,6 +1,6 @@
 #include <debug.h>
-#include <mem.h>
 #include <printf.h>
+#include <spinlock.h>
 #include <stdarg.h>
 #include <string.h>
 
@@ -12,17 +12,17 @@ int debugEmpty() {
 
 static SPINLOCK(cSpinlock);
 void debugPutc(char c) {
-  mSpinlockAcquire(&cSpinlock);
+  spinlockAcquire(&cSpinlock);
   while (debugEmpty() == 0) {
   }
 
   out8(COM1, c);
-  mSpinlockDrop(&cSpinlock);
+  spinlockDrop(&cSpinlock);
 }
 
 static SPINLOCK(debugSpinlock);
 void debug(char* fmt, ...) {
-  mSpinlockAcquire(&debugSpinlock);
+  spinlockAcquire(&debugSpinlock);
 
   va_list va;
   va_start(va, fmt);
@@ -39,7 +39,7 @@ void debug(char* fmt, ...) {
 
   va_end(va);
 
-  mSpinlockDrop(&debugSpinlock);
+  spinlockDrop(&debugSpinlock);
 }
 
 void debugInit() {

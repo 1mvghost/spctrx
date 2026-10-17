@@ -1,15 +1,15 @@
-#include <mem.h>
+#include <spinlock.h>
 
-void mSpinlockAcquire(Spinlock* lock) {
+void spinlockAcquire(Spinlock* lock) {
   while (atomic_flag_test_and_set_explicit(lock, memory_order_acquire)) {
     asm("pause");
   }
 }
 
-void mSpinlockDrop(Spinlock* lock) {
+void spinlockDrop(Spinlock* lock) {
   atomic_flag_clear_explicit(lock, memory_order_release);
 }
 
-void mSpinlockInit(Spinlock* lock) {
+void spinlockInit(Spinlock* lock) {
   *lock = (Spinlock)ATOMIC_FLAG_INIT;
 }

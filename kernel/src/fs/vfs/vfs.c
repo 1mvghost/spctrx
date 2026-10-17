@@ -1,8 +1,8 @@
 #include <debug.h>
 #include <dev.h>
 #include <ll.h>
-#include <mem.h>
 #include <slab.h>
+#include <spinlock.h>
 #include <string.h>
 #include <tmp.h>
 #include <vfs.h>
@@ -130,7 +130,7 @@ void vfsMount(char* path, char* dev, char* type) {
     return;
   }
 
-  mSpinlockAcquire(&mntSpinlock);
+  spinlockAcquire(&mntSpinlock);
 
   struct FsMnt* mnt = slabAlloc(&mntCache);
 
@@ -154,7 +154,7 @@ void vfsMount(char* path, char* dev, char* type) {
 
   debug("vfs: MOUNTED %s\n", path);
 
-  mSpinlockDrop(&mntSpinlock);
+  spinlockDrop(&mntSpinlock);
 }
 
 void vfsInit() {

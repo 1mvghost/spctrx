@@ -10,12 +10,12 @@
 #include <lapic.h>
 #include <limine.h>
 #include <ll.h>
-#include <mem.h>
 #include <mp.h>
 #include <ops.h>
 #include <pci.h>
 #include <pmm.h>
 #include <printf.h>
+#include <spinlock.h>
 #include <string.h>
 #include <util.h>
 #include <vmm.h>

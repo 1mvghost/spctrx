@@ -3,7 +3,7 @@
 #include <gdt.h>
 #include <idt.h>
 #include <lapic.h>
-#include <mem.h>
+#include <spinlock.h>
 #include <stdatomic.h>
 
 __attribute__((

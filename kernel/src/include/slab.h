@@ -2,7 +2,7 @@
 #define SLAB_H
 
 #include <ll.h>
-#include <mem.h>
+#include <spinlock.h>
 
 typedef struct {
   void* start;

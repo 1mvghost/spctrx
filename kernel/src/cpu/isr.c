@@ -2,9 +2,7 @@
 #include <idt.h>
 #include <irq.h>
 #include <isr.h>
-#include <mem.h>
 #include <panic.h>
-#include <printf.h>
 
 extern u64 isrStub[255];
 
