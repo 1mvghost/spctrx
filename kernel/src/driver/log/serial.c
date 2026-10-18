@@ -1,8 +1,5 @@
-#include <printf.h>
 #include <serial.h>
 #include <spinlock.h>
-#include <stdarg.h>
-#include <string.h>
 
 #define COM1 0x3F8
 

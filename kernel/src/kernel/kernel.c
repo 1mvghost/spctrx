@@ -1,8 +1,5 @@
 #include <acpi.h>
 #include <apic.h>
-#include <assert.h>
-#include <boot.h>
-#include <cons.h>
 #include <fb.h>
 #include <gdt.h>
 #include <idt.h>
@@ -15,6 +12,7 @@
 #include <pmm.h>
 #include <printf.h>
 #include <serial.h>
+#include <term.h>
 #include <test.h>
 #include <util.h>
 #include <vfs.h>
@@ -33,16 +31,15 @@ void main() {
   }
 
   serialInit();
+  fbInit();
+  termInit();
+
+  printf("spctrx v0.1 (www.github.com/1mvghost/spctrx)\n");
+  printf("64-Bit Long Mode\n\n");
 
   gdtInit();
   idtInit();
   isrInit();
-
-  fbInit();
-  consInit();
-
-  printf("spctrx v0.1 (www.github.com/1mvghost/spctrx)\n");
-  printf("64-Bit Long Mode\n\n");
 
   pmmInit();
   vmmInit();

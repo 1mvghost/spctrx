@@ -1,7 +1,7 @@
-#include <cons.h>
 #include <fb.h>
 #include <printf.h>
-#include <serial.h>
+#include <term.h>
+#include <util.h>
 
 #include <flanterm.h>
 #include <flanterm_backends/fb.h>
@@ -10,7 +10,6 @@
 #define FONT_HEIGHT 16
 
 /* credit to https://github.com/UnmappedStack/SpecOS/blob/main/misc/font.h */
-
 static u8 font[] = {
     0x00, 0x00, 0x00, 0x3e, 0x63, 0x5d, 0x7d, 0x7b, 0x77, 0x77, 0x7f, 0x77,
     0x3e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7e, 0x24, 0x24,
@@ -355,29 +354,32 @@ static u8 font[] = {
     0x00, 0x24, 0x24, 0x00, 0x00, 0x42, 0x42, 0x42, 0x42, 0x42, 0x46, 0x3a,
     0x02, 0x02, 0x42, 0x3c};
 
-static struct flanterm_context* consCtx;
+static struct flanterm_context* flantermCtx;
+
 static u32 fg = 0x00ffffff;
 
-static bool consInitialized = false;
+static bool termInitialized = false;
 
-void consInit() {
+void termInit() {
   struct limine_framebuffer* fb = fbGetMainFb();
 
-  consCtx = flanterm_fb_init(NULL, NULL, fb->address, fb->width, fb->height,
-                             fb->pitch, fb->red_mask_size, fb->red_mask_shift,
-                             fb->green_mask_size, fb->green_mask_shift,
-                             fb->blue_mask_size, fb->blue_mask_shift, NULL,
-                             NULL, NULL, NULL, &fg, NULL, NULL, &font,
-                             FONT_WIDTH, FONT_HEIGHT, 0, 0, 0, 0, 0, true);
+  flantermCtx = flanterm_fb_init(
+      NULL, NULL, fb->address, fb->width, fb->height, fb->pitch,
+      fb->red_mask_size, fb->red_mask_shift, fb->green_mask_size,
+      fb->green_mask_shift, fb->blue_mask_size, fb->blue_mask_shift, NULL, NULL,
+      NULL, NULL, &fg, NULL, NULL, &font, FONT_WIDTH, FONT_HEIGHT, 0, 0, 0, 0,
+      0, true);
 
-  consInitialized = true;
+  if (flantermCtx == 0) {
+    printf("term: failed to initialize flanterm!\n");
+    return;
+  }
+
+  termInitialized = true;
 }
 
-/* printf hook */
-void _putchar(char ch) {
-  serialPutc(ch);
-
-  if (!consInitialized) {
+void termPutc(char ch) {
+  if (!termInitialized) {
     return;
   }
 
@@ -385,8 +387,8 @@ void _putchar(char ch) {
    * newlines are broken without \r
    */
   if (ch == '\n') {
-    flanterm_write(consCtx, "\r", 1);
+    flanterm_write(flantermCtx, "\r", 1);
   }
 
-  flanterm_write(consCtx, &ch, 1);
+  flanterm_write(flantermCtx, &ch, 1);
 }
