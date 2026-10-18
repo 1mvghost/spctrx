@@ -1,4 +1,3 @@
-#include <debug.h>
 #include <idt.h>
 #include <irq.h>
 #include <isr.h>

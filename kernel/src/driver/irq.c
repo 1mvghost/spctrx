@@ -1,6 +1,6 @@
 #include <bitmap.h>
-#include <debug.h>
 #include <irq.h>
+#include <printf.h>
 #include <vmm.h>
 
 /**
@@ -14,7 +14,7 @@ static Bitmap irqBitmap;
 void irqHandle(int irq) {
   handlers[irq]();
 
-  debug("irq: received irq %d\n", irq);
+  printf("irq: received irq %d\n", irq);
 }
 
 int irqAllocVector() {
@@ -34,7 +34,7 @@ void irqInstall(int vector, void (*handler)()) {
 }
 
 void irqHandleSpurious() {
-  debug("irq: spurious interrupt!\n");
+  printf("irq: spurious interrupt!\n");
 }
 
 void irqInit() {

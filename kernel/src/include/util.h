@@ -1,6 +1,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -8,10 +9,6 @@ typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
-
-typedef uint8_t bool;
-#define true 1
-#define false 0
 
 #define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
 

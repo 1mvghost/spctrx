@@ -35,6 +35,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 
+#include <spinlock.h>
 
 #ifdef __cplusplus
 extern "C" {

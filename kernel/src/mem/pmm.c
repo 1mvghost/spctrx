@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <bitmap.h>
 #include <boot.h>
-#include <debug.h>
 #include <panic.h>
 #include <pmm.h>
+#include <printf.h>
 #include <spinlock.h>
 #include <string.h>
 #include <vmm.h>
@@ -33,8 +33,6 @@ u64 pmmAlloc(size_t pages) {
   }
 
   bitmapFill(&pmmBitmap, found, found + pages, true);
-
-  debug("pmm: allocated page at %llx\n", found * PAGE_SIZE);
 
   spinlockDrop(&pmmSpinlock);
   return found * PAGE_SIZE;
@@ -99,7 +97,7 @@ void pmmInit() {
     panic("not enough memory for the pmm bitmap!\n");
   }
 
-  debug("pmm: bitmap addr %llx\n", bitmapAddr);
+  printf("pmm: bitmap addr %llx\n", bitmapAddr);
 
   bitmapInit(&pmmBitmap, last / PAGE_SIZE, vmmPhysToVirt(bitmapAddr));
   bitmapFillAll(&pmmBitmap, true);

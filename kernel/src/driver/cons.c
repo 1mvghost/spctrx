@@ -1,5 +1,7 @@
+#include <cons.h>
 #include <debug.h>
 #include <fb.h>
+#include <printf.h>
 
 #include <flanterm.h>
 #include <flanterm_backends/fb.h>
@@ -356,6 +358,8 @@ static u8 font[] = {
 static struct flanterm_context* consCtx;
 static u32 fg = 0x00ffffff;
 
+static bool consInitialized = false;
+
 void consInit() {
   struct limine_framebuffer* fb = fbGetMainFb();
 
@@ -366,19 +370,23 @@ void consInit() {
                              NULL, NULL, NULL, &fg, NULL, NULL, &font,
                              FONT_WIDTH, FONT_HEIGHT, 0, 0, 0, 0, 0, true);
 
-  debug("cons: flanterm initialized!\n");
+  consInitialized = true;
 }
 
 /* printf hook */
 void _putchar(char ch) {
+  debugPutc(ch);
+
+  if (!consInitialized) {
+    return;
+  }
+
   /**
    * newlines are broken without \r
    */
   if (ch == '\n') {
     flanterm_write(consCtx, "\r", 1);
   }
-
-  debugPutc(ch);
 
   flanterm_write(consCtx, &ch, 1);
 }

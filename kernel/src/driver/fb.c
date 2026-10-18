@@ -1,5 +1,6 @@
-#include <debug.h>
 #include <fb.h>
+#include <panic.h>
+#include <printf.h>
 #include <util.h>
 
 __attribute__((
@@ -17,14 +18,11 @@ struct limine_framebuffer* fbGetMainFb() {
 void fbInit() {
   if (framebufferRequest.response == 0 ||
       framebufferRequest.response->framebuffers == 0) {
-    /**
-     * todo: dont halt directly!
-     */
-    disableInts();
-    halt();
+    panic("no framebuffers found!\n");
   }
 
   fb = framebufferRequest.response->framebuffers[0];
 
-  debug("fb: PITCH:%d HEIGHT:%d ADDR:%x\n", fb->pitch, fb->height, fb->address);
+  printf("fb: PITCH:%d HEIGHT:%d ADDR:%x\n", fb->pitch, fb->height,
+         fb->address);
 }

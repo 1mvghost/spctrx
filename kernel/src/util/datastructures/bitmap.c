@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <bitmap.h>
-#include <debug.h>
+#include <printf.h>
 #include <string.h>
 
 #define INDEX(pos) (pos / 64)
@@ -18,7 +18,8 @@ void bitmapInit(Bitmap* bitmap, size_t bits, u64* data) {
 
   memset(bitmap->data, 0, bitmap->dataSize);
 
-  debug("bitmap: new bitmap at %llx bits:%lld data:%llx\n", bitmap, bits, data);
+  printf("bitmap: new bitmap at %llx bits:%lld data:%llx\n", bitmap, bits,
+         data);
 }
 
 void bitmapSet(Bitmap* bitmap, size_t pos, bool value) {

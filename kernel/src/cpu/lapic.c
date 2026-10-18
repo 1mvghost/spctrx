@@ -1,5 +1,4 @@
-#include <debug.h>
-#include <lapic.h>
+#include <printf.h>
 #include <util.h>
 #include <vmm.h>
 
@@ -57,6 +56,6 @@ void lapicInit() {
    */
   lapicWriteReg(0xf0, lapicReadReg(0xf0) | 0x100);
 
-  debug("lapic: base %llx regver %x regid %x\n", lapicGetBase(),
-        lapicReadReg(0x30), lapicReadReg(0x20));
+  printf("lapic: base %llx regver %x regid %x\n", lapicGetBase(),
+         lapicReadReg(0x30), lapicReadReg(0x20));
 }

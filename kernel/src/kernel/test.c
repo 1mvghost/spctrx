@@ -1,6 +1,5 @@
 #include <acpi.h>
 #include <ahci.h>
-#include <debug.h>
 #include <fb.h>
 #include <gdt.h>
 #include <idt.h>
@@ -38,8 +37,8 @@ void test() {
 #endif
 #ifdef SERIAL_TEST
   // debugPuts("serial test test\n");
-  debug("serial printf test %d %d %d %x %x", 67, 69, 420, 0xdeadbeef,
-        0xcafebabe);
+  printf("serial printf test %d %d %d %x %x", 67, 69, 420, 0xdeadbeef,
+         0xcafebabe);
 #endif
 #ifdef PMM_TEST
   u64* a = pmmAlloc(1);

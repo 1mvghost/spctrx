@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <debug.h>
 #include <printf.h>
 #include <slab.h>
 #include <vmm.h>
@@ -35,8 +34,8 @@ void slabAllocSlab(SlabCache* cache) {
    */
   llInsertFront(&cache->empty, &header->head);
 
-  debug("slab: new slab for %s at %llx start:%llx firstfree:%llx\n",
-        cache->name, slab, header->start, header->firstFree);
+  printf("slab: new slab for %s at %llx start:%llx firstfree:%llx\n",
+         cache->name, slab, header->start, header->firstFree);
 }
 
 void* slabAlloc(SlabCache* cache) {
@@ -123,6 +122,6 @@ void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
   cache->objPerSlab = ((SLAB_SIZE_PAGES * PAGE_SIZE) - sizeof(Slab)) / objSize;
   spinlockInit(&cache->lock);
 
-  debug("slab: new cache %s (%llx) objsize:%lld objperslab:%lld\n", name, cache,
-        objSize, cache->objPerSlab);
+  printf("slab: new cache %s (%llx) objsize:%lld objperslab:%lld\n", name,
+         cache, objSize, cache->objPerSlab);
 }

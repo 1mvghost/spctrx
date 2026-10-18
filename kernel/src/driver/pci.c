@@ -1,7 +1,7 @@
 #include <ahci.h>
-#include <debug.h>
 #include <ll.h>
 #include <pci.h>
+#include <printf.h>
 #include <slab.h>
 
 #define CONFIG_ADDRESS 0xCF8
@@ -131,7 +131,7 @@ void pciCheckDevice(u32 bus, u32 dev) {
 
       llInsertFront(&pciDeviceList, &d->head);
 
-      debug(
+      printf(
           "pci: FOUND PCI: %s(%d) VENDOR:%x BAR0:%x BAR1:%x BAR2:%x BAR3:%x "
           "BAR4:%x BAR5:%x HEADER:%x\n",
           class[d->classcode], d->classcode, vendor, d->subclass, d->bar0,

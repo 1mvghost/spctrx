@@ -1,6 +1,6 @@
 #include <ahci.h>
-#include <debug.h>
 #include <pmm.h>
+#include <printf.h>
 #include <string.h>
 #include <vmm.h>
 
@@ -197,7 +197,7 @@ int ahciCmdFindFree(HbaPort* port) {
     }
     slots >>= 1;
   }
-  debug("ahci: CANNOT FIND FREE CMD SLOT\n");
+  printf("ahci: CANNOT FIND FREE CMD SLOT\n");
   return -1;
 }
 int ahciCheckType(HbaPort* port) {
@@ -230,7 +230,7 @@ bool ahciSendCommand(HbaPort* port) {
     spin++;
   }
   if (spin == wait) {
-    debug("ahci: PORT HUNG\n");
+    printf("ahci: PORT HUNG\n");
     return false;
   }
 
@@ -240,7 +240,7 @@ bool ahciSendCommand(HbaPort* port) {
   }
 
   if (port->is & HBA_PxIS_TFES) {
-    debug("ahci: ERROR\n");
+    printf("ahci: ERROR\n");
     return false;
   }
 
@@ -253,7 +253,7 @@ bool ahciReadOrWrite(int p, u64 lba, u32 sectAmount, void* buf, bool write) {
 
   int slot = ahciCmdFindFree(port);
   if (slot == -1) {
-    debug("ahci: no free slots right now\n");
+    printf("ahci: no free slots right now\n");
     return false;
   }
 
@@ -315,14 +315,14 @@ void ahciEnum() {
     if (pi & 1) {
       int type = ahciCheckType(&base->ports[i]);
       if (type == AHCI_DEV_SATA) {
-        debug("ahci: SATA drive found at port %d\n", i);
+        printf("ahci: SATA drive found at port %d\n", i);
         ahciRebase(&base->ports[i]);
       } else if (type == AHCI_DEV_SATAPI) {
-        debug("ahci: SATAPI drive found at port %d\n", i);
+        printf("ahci: SATAPI drive found at port %d\n", i);
       } else if (type == AHCI_DEV_SEMB) {
-        debug("ahci: SEMB drive found at port %d\n", i);
+        printf("ahci: SEMB drive found at port %d\n", i);
       } else if (type == AHCI_DEV_PM) {
-        debug("ahci: PM drive found at port %d\n", i);
+        printf("ahci: PM drive found at port %d\n", i);
       }
     }
     pi >>= 1;
@@ -330,7 +330,7 @@ void ahciEnum() {
 }
 void ahciInit(u64 bar5) {
   if (base != 0) {
-    debug("ahci: more than 1 controller is not supported yet\n");
+    printf("ahci: more than 1 controller is not supported yet\n");
     return;
   }
   vmmMapMMIO(bar5, 1);

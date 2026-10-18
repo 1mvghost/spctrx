@@ -1,6 +1,6 @@
-#include <debug.h>
 #include <dev.h>
 #include <ll.h>
+#include <printf.h>
 #include <slab.h>
 #include <spinlock.h>
 #include <string.h>
@@ -126,7 +126,7 @@ void vfsMount(char* path, char* dev, char* type) {
   struct FsNode* l = vfsLookup(path);
 
   if (!l) {
-    debug("vfs: cannot mnt on nonexistent path!!\n");
+    printf("vfs: cannot mnt on nonexistent path!!\n");
     return;
   }
 
@@ -152,7 +152,7 @@ void vfsMount(char* path, char* dev, char* type) {
 
   llInsertFront(&mnts, &mnt->head);
 
-  debug("vfs: MOUNTED %s\n", path);
+  printf("vfs: MOUNTED %s\n", path);
 
   spinlockDrop(&mntSpinlock);
 }

@@ -1,8 +1,8 @@
 #include <boot.h>
-#include <debug.h>
 #include <gdt.h>
 #include <idt.h>
 #include <lapic.h>
+#include <printf.h>
 #include <spinlock.h>
 #include <stdatomic.h>
 
@@ -26,12 +26,12 @@ void mpEntry(struct limine_mp_info* mp) {
 
 void mpInit() {
   if (mpRequest.response == 0) {
-    debug("mp: no extra cpus!\n");
+    printf("mp: no extra cpus!\n");
     return;
   }
 
   struct limine_mp_response* m = mpRequest.response;
-  debug("mp: found %d cpus\n", m->cpu_count);
+  printf("mp: found %d cpus\n", m->cpu_count);
 
   for (u64 i = 0; i < m->cpu_count; i++) {
     m->cpus[i]->goto_address = mpEntry;

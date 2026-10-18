@@ -20,28 +20,6 @@ void debugPutc(char c) {
   spinlockDrop(&cSpinlock);
 }
 
-static SPINLOCK(debugSpinlock);
-void debug(char* fmt, ...) {
-  spinlockAcquire(&debugSpinlock);
-
-  va_list va;
-  va_start(va, fmt);
-
-  char buf[1024];
-  memset(buf, 0, 1024);
-  vsnprintf(buf, 1024, fmt, va);
-
-  for (int i = 0; i < 1024; i++) {
-    if (!buf[i])
-      break;
-    debugPutc(buf[i]);
-  }
-
-  va_end(va);
-
-  spinlockDrop(&debugSpinlock);
-}
-
 void debugInit() {
   out8(COM1 + 1, 0x00);
   out8(COM1 + 3, 0x80);

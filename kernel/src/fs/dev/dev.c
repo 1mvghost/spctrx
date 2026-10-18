@@ -1,5 +1,6 @@
 #include <debug.h>
 #include <dev.h>
+#include <printf.h>
 #include <string.h>
 #include <vfs.h>
 
@@ -51,7 +52,7 @@ struct FsHandler devHandler = {.lookup = devLookup,
                                .write = devWrite,
                                .readdir = devReadDir};
 void devInit(struct FsMnt* mnt) {
-  debug("devfs: mnt is %s\n", mnt->path);
+  printf("devfs: mnt is %s\n", mnt->path);
 
   mnt->root = vfsAlloc(mnt, TYPE_DIR);
   mnt->root->ops = &devHandler;

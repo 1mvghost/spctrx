@@ -1,5 +1,5 @@
-#include <debug.h>
 #include <dev.h>
+#include <printf.h>
 #include <string.h>
 #include <tmp.h>
 #include <util.h>
@@ -42,7 +42,7 @@ struct FsHandler tmpHandler = {.lookup = tmpLookup,
                                .readdir = tmpReadDir,
                                .open = tmpOpen};
 void tmpInit(struct FsMnt* mnt) {
-  debug("tmpfs: mnt is %s\n", mnt->path);
+  printf("tmpfs: mnt is %s\n", mnt->path);
 
   mnt->root = vfsAlloc(mnt, TYPE_DIR);
   mnt->root->ops = &tmpHandler;

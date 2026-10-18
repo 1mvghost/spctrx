@@ -859,13 +859,22 @@ static int _vsnprintf(out_fct_type out, char* buffer, const size_t maxlen, const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+/**
+ * small tweak: add spinlock to printf to prevent logs from being unreadable when multiple cpus printf()
+ * this is just for now, there's probably a better way to do this.
+ */
+static SPINLOCK(printfSpinlock);
 int printf_(const char* format, ...)
 {
+  spinlockAcquire(&printfSpinlock);
+
   va_list va;
   va_start(va, format);
   char buffer[1];
   const int ret = _vsnprintf(_out_char, buffer, (size_t)-1, format, va);
   va_end(va);
+
+  spinlockDrop(&printfSpinlock);
   return ret;
 }
 
