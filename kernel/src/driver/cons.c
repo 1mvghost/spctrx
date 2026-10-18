@@ -1,7 +1,7 @@
 #include <cons.h>
-#include <debug.h>
 #include <fb.h>
 #include <printf.h>
+#include <serial.h>
 
 #include <flanterm.h>
 #include <flanterm_backends/fb.h>
@@ -375,7 +375,7 @@ void consInit() {
 
 /* printf hook */
 void _putchar(char ch) {
-  debugPutc(ch);
+  serialPutc(ch);
 
   if (!consInitialized) {
     return;

@@ -1,26 +1,28 @@
-#include <debug.h>
 #include <printf.h>
+#include <serial.h>
 #include <spinlock.h>
 #include <stdarg.h>
 #include <string.h>
 
 #define COM1 0x3F8
 
-int debugEmpty() {
+int serialIsEmpty() {
   return in8(COM1 + 5) & 0x20;
 }
 
-static SPINLOCK(cSpinlock);
-void debugPutc(char c) {
-  spinlockAcquire(&cSpinlock);
-  while (debugEmpty() == 0) {
+static SPINLOCK(serialSpinlock);
+void serialPutc(char ch) {
+  spinlockAcquire(&serialSpinlock);
+
+  while (serialIsEmpty() == 0) {
   }
 
-  out8(COM1, c);
-  spinlockDrop(&cSpinlock);
+  out8(COM1, ch);
+
+  spinlockDrop(&serialSpinlock);
 }
 
-void debugInit() {
+void serialInit() {
   out8(COM1 + 1, 0x00);
   out8(COM1 + 3, 0x80);
   out8(COM1 + 0, 0x03);

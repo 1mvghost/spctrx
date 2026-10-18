@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <boot.h>
 #include <cons.h>
-#include <debug.h>
 #include <fb.h>
 #include <gdt.h>
 #include <idt.h>
@@ -15,6 +14,7 @@
 #include <pci.h>
 #include <pmm.h>
 #include <printf.h>
+#include <serial.h>
 #include <test.h>
 #include <util.h>
 #include <vfs.h>
@@ -32,7 +32,7 @@ void main() {
     halt();
   }
 
-  debugInit();
+  serialInit();
 
   gdtInit();
   idtInit();

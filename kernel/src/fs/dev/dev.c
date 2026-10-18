@@ -1,6 +1,6 @@
-#include <debug.h>
 #include <dev.h>
 #include <printf.h>
+#include <serial.h>
 #include <string.h>
 #include <vfs.h>
 
@@ -40,7 +40,7 @@ int devOpen(struct FsNode* n, u64 flags) {
 int devWrite(struct FsFd* fd, u8* buf, u64 size) {
   if (fd->inode == dirdebug) {
     for (u64 i = 0; i < size; i++) {
-      debugPutc(buf[i]);
+      serialPutc(buf[i]);
     }
     return size;
   }
