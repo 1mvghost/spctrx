@@ -100,12 +100,12 @@ void ioApicWriteRedirEntry(IOAPIC* ioApic,
   u32 high = 0;
 
   low |= vector;
-  low |= (delivery & 0x3) << 7;
-  low |= (destinationMode & 1) << 10;
-  low |= (deliveryStatus & 1) << 11;
-  low |= (polarity & 1) << 12;
-  low |= (trigger & 1) << 14;
-  low |= (mask & 1) << 15;
+  low |= (delivery & 0x3) << 8;
+  low |= (destinationMode & 1) << 11;
+  low |= (deliveryStatus & 1) << 12;
+  low |= (polarity & 1) << 13;
+  low |= (trigger & 1) << 15;
+  low |= (mask & 1) << 16;
 
   high |= (destination << 24);
 
