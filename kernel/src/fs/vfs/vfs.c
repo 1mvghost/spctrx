@@ -2,7 +2,6 @@
 #include <ll.h>
 #include <printf.h>
 #include <slab.h>
-#include <spinlock.h>
 #include <string.h>
 #include <tmp.h>
 #include <vfs.h>
@@ -118,8 +117,6 @@ struct FsFd* vfsFdAlloc(struct FsNode* n, u64 flags) {
   return fd;
 }
 
-static SPINLOCK(mntSpinlock);
-
 static SlabCache mntCache;
 
 void vfsMount(char* path, char* dev, char* type) {
@@ -129,8 +126,6 @@ void vfsMount(char* path, char* dev, char* type) {
     printf("vfs: cannot mnt on nonexistent path!!\n");
     return;
   }
-
-  spinlockAcquire(&mntSpinlock);
 
   struct FsMnt* mnt = slabAlloc(&mntCache);
 
@@ -153,8 +148,6 @@ void vfsMount(char* path, char* dev, char* type) {
   llInsertFront(&mnts, &mnt->head);
 
   printf("vfs: MOUNTED %s\n", path);
-
-  spinlockDrop(&mntSpinlock);
 }
 
 void vfsInit() {
