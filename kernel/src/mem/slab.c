@@ -123,7 +123,7 @@ void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
   /**
    * keep the name within bounds
    */
-  ASSERT((size_t)strlen(name) < sizeof(cache->name));
+  ASSERT(strlen(name) < sizeof(cache->name));
 
   strcpy(cache->name, name);
 

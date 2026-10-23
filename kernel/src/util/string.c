@@ -55,11 +55,11 @@ int memcmp(void* a, void* b, size_t cnt) {
   return 0;
 }
 
-int strlen(char* s) {
+size_t strlen(char* s) {
   ASSERT(s != 0);
 
   char* ptr = s;
-  int res = 0;
+  size_t res = 0;
 
   while (*ptr) {
     res++;
