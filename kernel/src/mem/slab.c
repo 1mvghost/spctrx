@@ -26,8 +26,8 @@ void slabAllocSlab(SlabCache* cache) {
   header->usedObj = 0;
 
   for (size_t i = 0; i < cache->objPerSlab - 1; i++) {
-    *(size_t*)(header->start + (i * cache->objSize)) =
-        (size_t)header->start + ((i + 1) * cache->objSize);
+    *(u64*)(header->start + (i * cache->objSize)) =
+        (u64)header->start + ((i + 1) * cache->objSize);
   }
 
   /*
@@ -71,7 +71,7 @@ void* slabAlloc(SlabCache* cache) {
 
   char* result = slab->firstFree;
 
-  slab->firstFree = (char*)(*(size_t*)slab->firstFree);
+  slab->firstFree = (char*)(*(u64*)slab->firstFree);
   slab->usedObj++;
 
   /*
@@ -84,7 +84,7 @@ void* slabAlloc(SlabCache* cache) {
 
   spinlockDrop(&cache->lock);
 
-  return result + sizeof(size_t);
+  return result + sizeof(u64);
 }
 
 void slabFree(SlabCache* cache, void* addr) {
@@ -93,9 +93,9 @@ void slabFree(SlabCache* cache, void* addr) {
 
   spinlockAcquire(&cache->lock);
 
-  Slab* slab = (Slab*)ALIGN_DOWN((size_t)addr, SLAB_SIZE_PAGES * PAGE_SIZE);
+  Slab* slab = (Slab*)ALIGN_DOWN((u64)addr, SLAB_SIZE_PAGES * PAGE_SIZE);
 
-  *((size_t*)addr) = (size_t)slab->firstFree;
+  *((u64*)addr) = (u64)slab->firstFree;
 
   slab->firstFree = addr;
   slab->usedObj--;
@@ -118,7 +118,7 @@ void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
   ASSERT(cache != 0);
   ASSERT(objSize > 0);
 
-  objSize = ALIGN_UP(objSize, 8) + sizeof(size_t);
+  objSize = ALIGN_UP(objSize, 8) + sizeof(u64);
 
   /**
    * keep the name within bounds
