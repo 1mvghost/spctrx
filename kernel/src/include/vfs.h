@@ -7,32 +7,25 @@
 #define TYPE_DIR 1
 #define TYPE_FILE 2
 
-struct FsNode {
+typedef struct {
   u8 type;
-  struct FsMnt* mnt;
+  struct _FsMnt* mnt;
   void* fsData;
-  struct FsHandler* ops;
-};
+  struct _FsHandler* ops;
+} FsNode;
 
-struct FsMnt {
+typedef struct _FsMnt {
   char type[32];
   char dev[64];
   char path[64];
 
   /* make lookups less painful */
-  struct FsNode* mountpoint;
+  FsNode* mountpoint;
 
-  struct FsNode* root;
+  FsNode* root;
 
   LLHead head;
-};
-
-struct FsFd {
-  struct FsNode* inode;
-  struct FsMnt* mnt;
-  u64 pos;
-  u64 flags;
-};
+} FsMnt;
 
 /* not used for much for now, will be more useful when i start making userspace
  */
@@ -46,17 +39,20 @@ struct linux_dirent64 {
   char d_name[];
 };
 
-struct FsHandler {
-  int (*open)(struct FsNode* n, u64 flags);
-  int (*read)(struct FsFd* fd, u8* buf, u64 size);
-  int (*write)(struct FsFd* fd, u8* buf, u64 size);
-  void (*close)(struct FsFd* fd);
-  bool (*mkdir)(struct FsNode* n, char* name);
-  struct FsNode* (*lookup)(struct FsNode* n, char* name);
-  bool (*readdir)(struct FsFd* fd, struct linux_dirent64* buf, u64 size);
-};
+typedef struct _FsHandler {
+  int (*open)(FsNode* n, u64 flags);
+  int (*read)(FsNode* n, u8* buf, u64 size);
+  int (*write)(FsNode* n, u8* buf, u64 size);
+
+  bool (*readdir)(FsNode* n, struct linux_dirent64* buf, u64 size);
+
+  FsNode* (*lookup)(FsNode* n, char* name);
+} FsHandler;
+
+FsNode* vfsLookup(char* path);
+
+bool vfsMount(char* path, char* dev, char* type);
+
 void vfsInit();
-struct FsNode* vfsAlloc(struct FsMnt* mnt, u8 type);
-struct FsNode* vfsLookup(char* path);
-struct FsFd* vfsFdAlloc(struct FsNode* n, u64 flags);
+
 #endif

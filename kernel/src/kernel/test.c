@@ -62,34 +62,6 @@ void test() {
   }
   printf("hi!\n");
 #endif
-#define VFS_TEST
-#ifdef VFS_TEST
-  struct FsFd* fd = vfsOpen("/dev/dbg", 0x67);
-  if (!fd) {
-    return;
-  }
-
-  char* buf = "SERIAL TEST\n";
-  printf("vfs: wrote %d bytes\n", vfsWrite(fd, (u8*)buf, strlen(buf)));
-
-  printf("* readdir on /dev *\n");
-  struct FsFd* fd2 = vfsOpen("/dev", 0x03);
-  char testt[1024];
-  struct linux_dirent64* dent = (struct linux_dirent64*)testt;
-
-  vfsReadDir(fd2, dent, 1);
-  printf("%s\n", dent->d_name);
-
-  printf("* readdir on / *\n");
-  struct FsFd* fd3 = vfsOpen("/", 0x03);
-  char testtt[1024];
-  struct linux_dirent64* dentt = (struct linux_dirent64*)testtt;
-
-  vfsReadDir(fd3, dentt, 1);
-
-  printf("%s\n", dentt->d_name);
-
-#endif
 #ifdef CONS_TEST
   for (int i = 0; i < 100000; i++) {
     printf("abb");
