@@ -10,7 +10,6 @@
 #include <limine.h>
 #include <ll.h>
 #include <mp.h>
-#include <ops.h>
 #include <pci.h>
 #include <pmm.h>
 #include <printf.h>
