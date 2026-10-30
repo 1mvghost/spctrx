@@ -12,6 +12,8 @@ typedef struct {
   struct _FsMnt* mnt;
   void* fsData;
   struct _FsHandler* ops;
+
+  LLHead head;
 } FsNode;
 
 typedef struct _FsMnt {
@@ -25,6 +27,7 @@ typedef struct _FsMnt {
   FsNode* root;
 
   LLHead head;
+  LLHead nodes;
 } FsMnt;
 
 /* not used for much for now, will be more useful when i start making userspace
@@ -45,11 +48,13 @@ typedef struct _FsHandler {
   int (*write)(FsNode* n, u64 pos, u8* buf, u64 size);
   int (*create)(FsNode* n, FsNode* child);
   int (*mkdir)(FsNode* n, char* name);
-  
+
   bool (*readdir)(FsNode* n, u64 pos, struct linux_dirent64* buf, u64 size);
 
   FsNode* (*lookup)(FsNode* n, char* name);
 } FsHandler;
+
+FsNode* vfsAllocNode(FsMnt* mnt);
 
 FsNode* vfsLookup(char* path);
 

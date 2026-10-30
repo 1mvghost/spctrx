@@ -2,6 +2,7 @@
 #include <printf.h>
 #include <slab.h>
 #include <string.h>
+#include <tmpfs.h>
 #include <vfs.h>
 #include <vmm.h>
 
@@ -9,6 +10,17 @@ static LLHead mnts;
 static FsNode* root;
 
 static SlabCache nodeCache;
+
+FsNode* vfsAllocNode(FsMnt* mnt) {
+  FsNode* node = slabAlloc(&nodeCache);
+
+  node->mnt = mnt;
+  llInitHead(&node->head);
+
+  llInsertFront(&mnt->nodes, &node->head);
+
+  return node;
+}
 
 FsMnt* vfsFindMnt(FsNode* n) {
   if (!n) {
@@ -120,6 +132,11 @@ bool vfsMount(char* path, char* dev, char* type) {
   mnt->root = 0;
 
   llInitHead(&mnt->head);
+  llInitHead(&mnt->nodes);
+
+  if (!strcmp(type, "tmp")) {
+    tmpfsInit(mnt);
+  }
 
   llInsertFront(&mnts, &mnt->head);
 
