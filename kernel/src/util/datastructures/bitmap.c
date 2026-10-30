@@ -44,7 +44,7 @@ void bitmapFillAll(Bitmap* bitmap, bool value) {
   ASSERT(bitmap != 0);
 
   if (value) {
-    memset(bitmap->data, 0xf, bitmap->dataSize);
+    memset(bitmap->data, 0xff, bitmap->dataSize);
   } else {
     memset(bitmap->data, 0, bitmap->dataSize);
   }

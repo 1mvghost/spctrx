@@ -1,14 +1,14 @@
 #include <assert.h>
 #include <string.h>
 
-void memset(void* dst, char value, int n) {
+void memset(void* dst, u8 value, size_t n) {
   ASSERT(dst != 0);
   ASSERT(n > 0);
 
   asm volatile("rep stosb" : : "a"(value), "c"(n));
 }
 
-void* memcpy(void* dst, void* src, int n) {
+void* memcpy(void* dst, void* src, size_t n) {
   ASSERT(dst != 0);
   ASSERT(src != 0);
   ASSERT(n > 0);

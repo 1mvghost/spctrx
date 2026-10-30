@@ -3,8 +3,8 @@
 
 #include <util.h>
 
-void memset(void* dst, char value, int n);
-void* memcpy(void* dst, void* src, int n);
+void memset(void* dst, u8 value, size_t n);
+void* memcpy(void* dst, void* src, size_t n);
 void* memmove(void* dstptr, const void* srcptr, size_t size);
 int memcmp(void* a, void* b, size_t cnt);
 size_t strlen(char* s);
