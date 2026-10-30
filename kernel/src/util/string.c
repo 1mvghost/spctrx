@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <string.h>
 
-void memset(void* dst, u8 value, size_t n) {
+void memset(void* dst, int value, size_t n) {
   ASSERT(dst != 0);
   ASSERT(n > 0);
 
