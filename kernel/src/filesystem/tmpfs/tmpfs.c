@@ -7,7 +7,8 @@
 static SlabCache tmpfsNodeCache;
 static FsHandler tmpfsHandler = {.create = tmpfsCreate,
                                  .lookup = tmpfsLookup,
-                                 .mkdir = tmpfsMkdir};
+                                 .mkdir = tmpfsMkdir,
+                                 .readdir = tmpfsReaddir};
 
 FsNode* tmpfsAllocNode(FsMnt* mnt, char* name, int type) {
   FsNode* node = vfsAllocNode(mnt);
@@ -41,6 +42,26 @@ int tmpfsAddChild(FsNode* n, FsNode* child) {
   llInsertFront(&tmpfsNode->children, &tmpfsChild->childHead);
 
   return 0;
+}
+
+bool tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf) {
+  TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
+
+  LLHead* current;
+  LL_TRAVERSE(current, &tmpfsNode->children) {
+    TmpfsNode* child = LIST_ENTRY(current, TmpfsNode, childHead);
+
+    if (pos == 0) {
+      strcpy(buf->d_name, child->name);
+      buf->d_type = child->node->type;
+      buf->d_reclen = sizeof(struct linux_dirent64) + strlen(buf->d_name) + 1;
+
+      return true;
+    }
+
+    pos--;
+  }
+  return false;
 }
 
 int tmpfsCreate(FsNode* n, char* name) {

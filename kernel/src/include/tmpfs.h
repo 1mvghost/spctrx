@@ -14,6 +14,7 @@ typedef struct {
   void* data;
 } TmpfsNode;
 
+bool tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf);
 int tmpfsCreate(FsNode* n, char* name);
 int tmpfsMkdir(FsNode* n, char* name);
 FsNode* tmpfsLookup(FsNode* n, char* name);
