@@ -135,7 +135,7 @@ bool vfsMount(char* path, char* dev, char* type) {
   llInitHead(&mnt->nodes);
 
   if (!strcmp(type, "tmp")) {
-    tmpfsInit(mnt);
+    tmpfsMount(mnt);
   }
 
   llInsertFront(&mnts, &mnt->head);
@@ -157,6 +157,8 @@ void vfsInit() {
   llInitHead(&mnts);
 
   root = slabAlloc(&nodeCache);
+
+  tmpfsInit();
 
   vfsDoMounts();
 }

@@ -8,7 +8,7 @@
 #define TYPE_FILE 2
 
 typedef struct {
-  u8 type;
+  int type;
   struct _FsMnt* mnt;
   void* fsData;
   struct _FsHandler* ops;
@@ -46,10 +46,10 @@ typedef struct _FsHandler {
   int (*open)(FsNode* n, u64 flags);
   int (*read)(FsNode* n, u64 pos, u8* buf, u64 size);
   int (*write)(FsNode* n, u64 pos, u8* buf, u64 size);
-  int (*create)(FsNode* n, FsNode* child);
+  int (*create)(FsNode* n, char* name);
   int (*mkdir)(FsNode* n, char* name);
 
-  bool (*readdir)(FsNode* n, u64 pos, struct linux_dirent64* buf, u64 size);
+  bool (*readdir)(FsNode* n, u64 pos, struct linux_dirent64* buf);
 
   FsNode* (*lookup)(FsNode* n, char* name);
 } FsHandler;

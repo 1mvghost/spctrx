@@ -17,10 +17,10 @@ int vfsRead(char* path, u64 pos, void* buf, u64 size) {
   return 0;
 }
 
-bool vfsReadDir(char* path, u64 pos, struct linux_dirent64* buf, u64 size) {
+bool vfsReadDir(char* path, u64 pos, struct linux_dirent64* buf) {
   FsNode* node = vfsLookup(path);
   if (node && node->ops->readdir) {
-    return node->ops->readdir(node, pos, buf, size);
+    return node->ops->readdir(node, pos, buf);
   }
   return false;
 }
