@@ -3,6 +3,11 @@
 
 #include <ll.h>
 
+#define IOAPIC_REGID 0x00
+#define IOAPIC_REGVER 0x01
+#define IOAPIC_REGPRIORITY 0x02
+#define IOAPIC_REGREDIR 0x10
+
 typedef struct {
   char* ioAddr;
   u32 gsiStart;

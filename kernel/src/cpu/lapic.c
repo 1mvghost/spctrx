@@ -1,10 +1,7 @@
+#include <lapic.h>
 #include <printf.h>
 #include <util.h>
 #include <vmm.h>
-
-#define IA32_APIC_BASE_MSR 0x1B
-#define IA32_APIC_BASE_MSR_BSP 0x100  // Processor is a BSP
-#define IA32_APIC_BASE_MSR_ENABLE 0x800
 
 void lapicSetBase(u64 base) {
   base |= IA32_APIC_BASE_MSR_ENABLE;
@@ -34,15 +31,15 @@ u32 lapicReadReg(u32 reg) {
 }
 
 void lapicSendEOI() {
-  lapicWriteReg(0xb0, 0);
+  lapicWriteReg(LAPIC_REGEOI, 0);
 }
 
 void lapicInit() {
   /**
    * disable the pic
    */
-  out8(0x21, 0xff);
-  out8(0xa1, 0xff);
+  out8(PIC1_DATA, 0xff);
+  out8(PIC2_DATA, 0xff);
 
   vmmMapMMIO(lapicGetBase(), 1);
 
@@ -54,8 +51,8 @@ void lapicInit() {
   /**
    * set the spurious interrupt register to start receiving interrupts
    */
-  lapicWriteReg(0xf0, lapicReadReg(0xf0) | 0x100);
+  lapicWriteReg(LAPIC_REGSPI, lapicReadReg(LAPIC_REGSPI) | 0x100);
 
   printf("lapic: base %llx regver %x regid %x\n", lapicGetBase(),
-         lapicReadReg(0x30), lapicReadReg(0x20));
+         lapicReadReg(LAPIC_REGVER), lapicReadReg(LAPIC_REGID));
 }

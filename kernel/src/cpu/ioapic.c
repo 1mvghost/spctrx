@@ -1,6 +1,5 @@
 #include <acpi.h>
 #include <ioapic.h>
-#include <lapic.h>
 #include <panic.h>
 #include <printf.h>
 #include <slab.h>
@@ -30,7 +29,7 @@ void ioApicAdd(int id, u64 ioAddr, u32 baseGsi) {
   ioApic->ioAddr = vmmPhysToVirt(ioAddr);
   ioApic->gsiStart = baseGsi;
 
-  int redirEntries = (ioApicReadReg(ioApic, 0x01) >> 16) + 1;
+  int redirEntries = (ioApicReadReg(ioApic, IOAPIC_REGVER) >> 16) + 1;
   ioApic->gsiEnd = baseGsi + redirEntries;
 
   ioApic->id = id;
@@ -109,7 +108,7 @@ void ioApicWriteRedirEntry(IOAPIC* ioApic,
 
   high |= (destination << 24);
 
-  int pos = (0x10 + 2 * entryId);
+  int pos = (IOAPIC_REGREDIR + 2 * entryId);
 
   ioApicWriteReg(ioApic, pos, low);
   ioApicWriteReg(ioApic, pos + 1, high);
