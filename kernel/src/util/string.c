@@ -97,3 +97,23 @@ char* strcpy(char* dst, char* src) {
   dst[i] = '\0';
   return dst;
 }
+
+char* strncpy(char* dst, char* src, size_t n) {
+  /**
+   * https://linux.die.net/man/3/strncpy
+   */
+
+  ASSERT(dst != 0);
+  ASSERT(src != 0);
+  ASSERT(n > 0);
+
+  size_t i = 0;
+  for (; i < n && src[i] != '\0'; i++) {
+    dst[i] = src[i];
+  }
+  for (; i < n; i++) {
+    dst[i] = '\0';
+  }
+
+  return dst;
+}

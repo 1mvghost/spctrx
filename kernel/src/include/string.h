@@ -10,5 +10,6 @@ int memcmp(void* a, void* b, size_t cnt);
 size_t strlen(char* s);
 int strcmp(const char* s1, const char* s2);
 char* strcpy(char* dst, char* src);
+char* strncpy(char* dst, char* src, size_t n);
 
 #endif

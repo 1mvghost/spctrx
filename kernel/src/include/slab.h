@@ -14,7 +14,7 @@ typedef struct {
 } Slab;
 
 typedef struct {
-  char name[64];
+  char name[64 + 1];
 
   LLHead full;
   LLHead partial;

@@ -124,9 +124,9 @@ bool vfsMount(char* path, char* dev, char* type) {
 
   FsMnt* mnt = slabAlloc(&mntCache);
 
-  strcpy(mnt->type, type);
-  strcpy(mnt->dev, dev);
-  strcpy(mnt->path, path);
+  strncpy(mnt->type, type, sizeof(mnt->type) - 1);
+  strncpy(mnt->dev, dev, sizeof(mnt->dev) - 1);
+  strncpy(mnt->path, path, sizeof(mnt->path) - 1);
 
   mnt->mountpoint = lookedUp;
   mnt->root = 0;

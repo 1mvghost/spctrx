@@ -18,7 +18,7 @@ FsNode* tmpfsAllocNode(FsMnt* mnt, char* name, int type) {
 
   TmpfsNode* tmpfsNode = slabAlloc(&tmpfsNodeCache);
 
-  strcpy(tmpfsNode->name, name);
+  strncpy(tmpfsNode->name, name, sizeof(tmpfsNode->name) - 1);
 
   if (type == TYPE_FILE) {
     tmpfsNode->data = vmmAlloc(1);

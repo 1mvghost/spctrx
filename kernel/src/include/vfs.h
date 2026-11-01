@@ -17,9 +17,9 @@ typedef struct {
 } FsNode;
 
 typedef struct _FsMnt {
-  char type[32];
-  char dev[64];
-  char path[64];
+  char type[32 + 1];
+  char dev[64 + 1];
+  char path[64 + 1];
 
   /* make lookups less painful */
   FsNode* mountpoint;

@@ -120,12 +120,7 @@ void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
 
   objSize = ALIGN_UP(objSize, 8) + sizeof(u64);
 
-  /**
-   * keep the name within bounds
-   */
-  ASSERT(strlen(name) < sizeof(cache->name));
-
-  strcpy(cache->name, name);
+  strncpy(cache->name, name, sizeof(cache->name) - 1);
 
   llInitHead(&cache->full);
   llInitHead(&cache->partial);

@@ -5,7 +5,7 @@
 #include <vfs.h>
 
 typedef struct {
-  char name[32];
+  char name[32 + 1];
   FsNode* node;
 
   LLHead childHead;
