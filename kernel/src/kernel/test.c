@@ -16,6 +16,7 @@
 #include <spinlock.h>
 #include <string.h>
 #include <util.h>
+#include <vfsops.h>
 #include <vmm.h>
 
 void tick() {
@@ -84,5 +85,21 @@ void test() {
    * pit timer
    */
   ioApicMapISA(0, vector);
+#endif
+#define VFS_TEST
+#ifdef VFS_TEST
+  vfsCreate("/", "test");
+
+  char* buf = "hello world!";
+  vfsWrite("/test", 1, buf, 13);
+
+  u8 read[14];
+  vfsRead("/test", 0, &read, 14);
+
+  printf("* read from /test *\n");
+  for (u64 i = 0; i < sizeof(read); i++) {
+    printf("%c", read[i]);
+  }
+  printf("\n");
 #endif
 }

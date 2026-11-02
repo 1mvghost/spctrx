@@ -11,9 +11,11 @@ typedef struct {
   LLHead childHead;
   LLHead children;
 
-  void* data;
+  u8* data;
 } TmpfsNode;
 
+size_t tmpfsRead(FsNode* n, u64 pos, u8* buf, u64 size);
+size_t tmpfsWrite(FsNode* n, u64 pos, u8* buf, u64 size);
 bool tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf);
 int tmpfsCreate(FsNode* n, char* name);
 int tmpfsMkdir(FsNode* n, char* name);

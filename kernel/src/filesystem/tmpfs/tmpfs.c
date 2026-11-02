@@ -4,8 +4,15 @@
 #include <tmpfs.h>
 #include <vmm.h>
 
+/**
+ * todo: get rid of this
+ */
+#define FILE_SIZE_PAGES 2
+
 static SlabCache tmpfsNodeCache;
-static FsHandler tmpfsHandler = {.create = tmpfsCreate,
+static FsHandler tmpfsHandler = {.read = tmpfsRead,
+                                 .write = tmpfsWrite,
+                                 .create = tmpfsCreate,
                                  .lookup = tmpfsLookup,
                                  .mkdir = tmpfsMkdir,
                                  .readdir = tmpfsReaddir};
@@ -21,7 +28,8 @@ FsNode* tmpfsAllocNode(FsMnt* mnt, char* name, int type) {
   strncpy(tmpfsNode->name, name, sizeof(tmpfsNode->name) - 1);
 
   if (type == TYPE_FILE) {
-    tmpfsNode->data = vmmAlloc(1);
+    tmpfsNode->data = vmmAlloc(FILE_SIZE_PAGES);
+    memset(tmpfsNode->data, 0, FILE_SIZE_PAGES * PAGE_SIZE);
   }
 
   tmpfsNode->node = node;
@@ -42,6 +50,34 @@ int tmpfsAddChild(FsNode* n, FsNode* child) {
   llInsertFront(&tmpfsNode->children, &tmpfsChild->childHead);
 
   return 0;
+}
+
+size_t tmpfsReadWrite(FsNode* n, u64 pos, u8* buf, u64 size, bool write) {
+  if (n->type == TYPE_DIR) {
+    return 0;
+  }
+
+  if ((pos + size) >= (FILE_SIZE_PAGES * PAGE_SIZE)) {
+    return 0;
+  }
+
+  TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
+
+  if (write) {
+    memcpy(tmpfsNode->data + pos, buf, size);
+  } else {
+    memcpy(buf, tmpfsNode->data + pos, size);
+  }
+
+  return size;
+}
+
+size_t tmpfsRead(FsNode* n, u64 pos, u8* buf, u64 size) {
+  return tmpfsReadWrite(n, pos, buf, size, false);
+}
+
+size_t tmpfsWrite(FsNode* n, u64 pos, u8* buf, u64 size) {
+  return tmpfsReadWrite(n, pos, buf, size, true);
 }
 
 bool tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf) {
