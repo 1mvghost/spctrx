@@ -1,5 +1,6 @@
 #include <acpi.h>
 #include <apic.h>
+#include <boot.h>
 #include <fb.h>
 #include <gdt.h>
 #include <idt.h>
@@ -40,6 +41,8 @@ void main() {
   gdtInit();
   idtInit();
   isrInit();
+
+  parseBootInfo();
 
   pmmInit();
   vmmInit();

@@ -28,6 +28,7 @@ iso:
 	@cp limine.conf $(ISO)/boot/limine/limine.conf
 
 	@cp $(KERNEL_BUILD) $(ISO)/boot/kernel.sys
+	@cp README.md $(ISO)/boot/test.txt
 
 	@xorriso -as mkisofs -R -r -J -b boot/limine/limine-bios-cd.bin \
         -no-emul-boot -boot-load-size 4 -boot-info-table -hfsplus \

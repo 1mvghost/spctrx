@@ -5,5 +5,6 @@
 #include <util.h>
 
 u64 getHHDM();
+void parseBootInfo();
 
 #endif
