@@ -1,9 +1,11 @@
+#include <devfs.h>
 #include <ll.h>
 #include <printf.h>
 #include <slab.h>
 #include <string.h>
 #include <tmpfs.h>
 #include <vfs.h>
+#include <vfsops.h>
 #include <vmm.h>
 
 static LLHead mnts;
@@ -137,6 +139,9 @@ bool vfsMount(char* path, char* dev, char* type) {
   if (!strcmp(type, "tmp")) {
     tmpfsMount(mnt);
   }
+  if (!strcmp(type, "dev")) {
+    devfsMount(mnt);
+  }
 
   llInsertFront(&mnts, &mnt->head);
 
@@ -147,6 +152,9 @@ bool vfsMount(char* path, char* dev, char* type) {
 
 void vfsDoMounts() {
   vfsMount("/", "", "tmp");
+
+  vfsMkdir("/", "dev");
+
   vfsMount("/dev", "", "dev");
 }
 

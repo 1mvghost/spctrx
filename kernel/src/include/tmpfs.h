@@ -14,6 +14,8 @@ typedef struct {
   u8* data;
 } TmpfsNode;
 
+FsNode* tmpfsAllocNode(FsMnt* mnt, char* name, int type);
+
 size_t tmpfsRead(FsNode* n, u64 pos, u8* buf, u64 size);
 size_t tmpfsWrite(FsNode* n, u64 pos, u8* buf, u64 size);
 bool tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf);

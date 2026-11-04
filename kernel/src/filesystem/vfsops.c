@@ -32,3 +32,11 @@ int vfsCreate(char* path, char* name) {
   }
   return 0;
 }
+
+int vfsMkdir(char* path, char* name) {
+  FsNode* node = vfsLookup(path);
+  if (node && node->ops->mkdir) {
+    return node->ops->mkdir(node, name);
+  }
+  return 0;
+}

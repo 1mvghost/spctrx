@@ -101,5 +101,8 @@ void test() {
     printf("%c", read[i]);
   }
   printf("\n");
+
+  char* test = "* hello world from write to /dev/tty *\n";
+  vfsWrite("/dev/tty", 0, test, strlen(test));
 #endif
 }

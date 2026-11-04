@@ -125,11 +125,6 @@ FsNode* tmpfsLookup(FsNode* n, char* name) {
 void tmpfsMount(FsMnt* mnt) {
   mnt->root = tmpfsAllocNode(mnt, "", TYPE_DIR);
 
-  /**
-   * todo: remove
-   */
-  tmpfsMkdir(mnt->root, "dev");
-
   printf("tmpfs: new mnt %s\n", mnt->path);
 }
 
