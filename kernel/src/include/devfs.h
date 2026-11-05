@@ -3,7 +3,7 @@
 
 #include <vfs.h>
 
-size_t devfsWrite(FsNode* n, u64 pos, u8* buf, u64 size);
+int devfsWrite(FsNode* n, u64 pos, void* buf, size_t size);
 void devfsMount(FsMnt* mnt);
 
 #endif

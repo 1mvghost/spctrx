@@ -44,12 +44,11 @@ struct linux_dirent64 {
 
 typedef struct _FsHandler {
   int (*open)(FsNode* n, u64 flags);
-  size_t (*read)(FsNode* n, u64 pos, u8* buf, u64 size);
-  size_t (*write)(FsNode* n, u64 pos, u8* buf, u64 size);
+  int (*read)(FsNode* n, u64 pos, void* buf, size_t size);
+  int (*write)(FsNode* n, u64 pos, void* buf, size_t size);
   int (*create)(FsNode* n, char* name);
   int (*mkdir)(FsNode* n, char* name);
-
-  bool (*readdir)(FsNode* n, u64 pos, struct linux_dirent64* buf);
+  int (*readdir)(FsNode* n, u64 pos, struct linux_dirent64* buf);
 
   FsNode* (*lookup)(FsNode* n, char* name);
 } FsHandler;

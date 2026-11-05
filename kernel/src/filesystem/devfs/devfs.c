@@ -14,45 +14,44 @@ static FsHandler devfsHandler = {.write = devfsWrite,
                                  .mkdir = tmpfsMkdir,
                                  .readdir = tmpfsReaddir};
 
-size_t devfsWrite(FsNode* n, u64 pos, u8* buf, u64 size) {
+int devfsWrite(FsNode* n, u64 pos, void* buf, size_t size) {
   UNUSED(pos);
+
+  char* buffer = (char*)buf;
 
   /**
    * read in the device type
    */
-  u8 typeBuffer[32 + 1];
+  char type[32 + 1];
 
-  if (!tmpfsRead(n, 0, typeBuffer, sizeof(typeBuffer) - 1)) {
-    return 0;
+  if (tmpfsRead(n, 0, type, sizeof(type) - 1) < 0) {
+    return -1;
   }
-
-  char* type = (char*)typeBuffer;
 
   /**
    * TODO: implement a better way to do this
    */
   if (!strcmp(type, "tty")) {
     for (u64 i = 0; i < size; i++) {
-      printf("%c", buf[i]);
+      printf("%c", buffer[i]);
     }
-
-    return size;
   }
+
   return 0;
 }
 
 void devfsCreateDev(FsMnt* mnt, char* name) {
-  tmpfsCreate(mnt->root, name);
-
-  FsNode* node = tmpfsLookup(mnt->root, name);
-  if (node == 0) {
-    printf("devfs: tmpfs bug, lookup for created node failed\n");
+  if (tmpfsCreate(mnt->root, name) < 0) {
+    printf("devfs: tmpfs bug, node creation failed!\n");
     return;
   }
 
+  FsNode* node = tmpfsLookup(mnt->root, name);
   node->ops = &devfsHandler;
 
-  tmpfsWrite(node, 0, (u8*)name, sizeof(name));
+  if (tmpfsWrite(node, 0, name, sizeof(name)) < 0) {
+    printf("devfs: tmpfs bug, write to created node failed!\n");
+  }
 }
 
 void devfsMount(FsMnt* mnt) {

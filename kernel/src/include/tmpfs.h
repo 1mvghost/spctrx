@@ -16,9 +16,9 @@ typedef struct {
 
 FsNode* tmpfsAllocNode(FsMnt* mnt, char* name, int type);
 
-size_t tmpfsRead(FsNode* n, u64 pos, u8* buf, u64 size);
-size_t tmpfsWrite(FsNode* n, u64 pos, u8* buf, u64 size);
-bool tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf);
+int tmpfsRead(FsNode* n, u64 pos, void* buf, size_t size);
+int tmpfsWrite(FsNode* n, u64 pos, void* buf, size_t size);
+int tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf);
 int tmpfsCreate(FsNode* n, char* name);
 int tmpfsMkdir(FsNode* n, char* name);
 FsNode* tmpfsLookup(FsNode* n, char* name);

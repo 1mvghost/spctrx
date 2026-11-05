@@ -52,13 +52,13 @@ int tmpfsAddChild(FsNode* n, FsNode* child) {
   return 0;
 }
 
-size_t tmpfsReadWrite(FsNode* n, u64 pos, u8* buf, u64 size, bool write) {
+int tmpfsReadWrite(FsNode* n, u64 pos, void* buf, size_t size, bool write) {
   if (n->type == TYPE_DIR) {
-    return 0;
+    return -1;
   }
 
   if ((pos + size) >= (FILE_SIZE_PAGES * PAGE_SIZE)) {
-    return 0;
+    return -1;
   }
 
   TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
@@ -69,18 +69,18 @@ size_t tmpfsReadWrite(FsNode* n, u64 pos, u8* buf, u64 size, bool write) {
     memcpy(buf, tmpfsNode->data + pos, size);
   }
 
-  return size;
+  return 0;
 }
 
-size_t tmpfsRead(FsNode* n, u64 pos, u8* buf, u64 size) {
+int tmpfsRead(FsNode* n, u64 pos, void* buf, size_t size) {
   return tmpfsReadWrite(n, pos, buf, size, false);
 }
 
-size_t tmpfsWrite(FsNode* n, u64 pos, u8* buf, u64 size) {
+int tmpfsWrite(FsNode* n, u64 pos, void* buf, size_t size) {
   return tmpfsReadWrite(n, pos, buf, size, true);
 }
 
-bool tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf) {
+int tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf) {
   TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
 
   LLHead* current;
@@ -92,12 +92,12 @@ bool tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf) {
       buf->d_type = child->node->type;
       buf->d_reclen = sizeof(struct linux_dirent64) + strlen(buf->d_name) + 1;
 
-      return true;
+      return 0;
     }
 
     pos--;
   }
-  return false;
+  return -1;
 }
 
 int tmpfsCreate(FsNode* n, char* name) {

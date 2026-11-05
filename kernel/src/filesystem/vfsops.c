@@ -1,7 +1,7 @@
 #include <vfs.h>
 #include <vfsops.h>
 
-size_t vfsWrite(char* path, u64 pos, void* buf, u64 size) {
+int vfsWrite(char* path, u64 pos, void* buf, size_t size) {
   FsNode* node = vfsLookup(path);
   if (node && node->ops->write) {
     return node->ops->write(node, pos, buf, size);
@@ -9,7 +9,7 @@ size_t vfsWrite(char* path, u64 pos, void* buf, u64 size) {
   return 0;
 }
 
-size_t vfsRead(char* path, u64 pos, void* buf, u64 size) {
+int vfsRead(char* path, u64 pos, void* buf, size_t size) {
   FsNode* node = vfsLookup(path);
   if (node && node->ops->read) {
     return node->ops->read(node, pos, buf, size);
@@ -17,12 +17,12 @@ size_t vfsRead(char* path, u64 pos, void* buf, u64 size) {
   return 0;
 }
 
-bool vfsReadDir(char* path, u64 pos, struct linux_dirent64* buf) {
+int vfsReadDir(char* path, u64 pos, struct linux_dirent64* buf) {
   FsNode* node = vfsLookup(path);
   if (node && node->ops->readdir) {
     return node->ops->readdir(node, pos, buf);
   }
-  return false;
+  return 0;
 }
 
 int vfsCreate(char* path, char* name) {
