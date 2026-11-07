@@ -13,6 +13,7 @@
 #include <pci.h>
 #include <pmm.h>
 #include <printf.h>
+#include <slab.h>
 #include <spinlock.h>
 #include <string.h>
 #include <util.h>
@@ -104,5 +105,19 @@ void test() {
 
   char* test = "* hello world from write to /dev/tty *\n";
   vfsWrite("/dev/tty", 0, test, strlen(test));
+#endif
+#ifdef SLAB_TEST
+  SlabCache testCache;
+  slabInitCache(&testCache, "test cache", 32);
+
+  for (int i = 0; i < 102; i++) {
+    void* allocated = slabAlloc(&testCache);
+
+    printf("%llx\n", allocated);
+
+    if (i % 5 == 0) {
+      slabFree(&testCache, allocated);
+    }
+  }
 #endif
 }
