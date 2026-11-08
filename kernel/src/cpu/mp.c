@@ -1,10 +1,9 @@
 #include <boot.h>
+#include <cpu.h>
 #include <gdt.h>
 #include <idt.h>
 #include <lapic.h>
 #include <printf.h>
-#include <spinlock.h>
-#include <stdatomic.h>
 
 __attribute__((
     used,

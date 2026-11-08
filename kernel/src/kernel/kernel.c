@@ -1,6 +1,7 @@
 #include <acpi.h>
 #include <apic.h>
 #include <boot.h>
+#include <cpu.h>
 #include <fb.h>
 #include <gdt.h>
 #include <idt.h>

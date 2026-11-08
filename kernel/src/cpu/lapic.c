@@ -1,3 +1,4 @@
+#include <cpu.h>
 #include <io.h>
 #include <lapic.h>
 #include <printf.h>

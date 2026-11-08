@@ -1,6 +1,8 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include <util.h>
+
 /* taken from https://wiki.osdev.org/CPUID */
 enum {
   CPUID_FEAT_EBX_BRAND_INDEX = 0xFF << 0,
@@ -75,5 +77,15 @@ enum {
 #define CPUID_FEAT_EBX_INITIAL_APIC_ID 0xFFull << 24
 #define CPUID_FEAT_ECX_HYPERVISOR 1ull << 31
 #define CPUID_FEAT_EDX_PBE 1ull << 31
+
+void disableInts();
+void enableInts();
+void waitForInterrupt();
+void halt();
+
+void wrmsr(u32 msr, u64 value);
+u64 rdmsr(u32 msr);
+
+void cpuid(u32* eax, u32* ebx, u32* ecx, u32* edx);
 
 #endif

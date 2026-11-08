@@ -1,3 +1,4 @@
+#include <cpu.h>
 #include <panic.h>
 #include <printf.h>
 #include <stdarg.h>
@@ -54,31 +55,31 @@ void panicIsr(Regs* regs) {
 }
 
 void doPanic(char* err) {
-  u32 eax = 1, ebx, ecx, edx;
-  cpuid(&eax, &ebx, &ecx, &edx);
-  u32 cpuId = (ebx >> 24) & 0xFF;
-
-  if (*err != '\0')
+  if (*err != '\0') {
     printf("panic: %s", err);
-  printf("panic: caused by cpu%d\n", cpuId);
+  }
+
   printf("panic: --- Kernel Call Trace ---\n");
 
   struct Stacktrace* stk;
   asm("movq %%rbp,%0" : "=r"(stk)::);
 
   for (u64 fr = 0; stk && fr < 10; ++fr) {
-    if (stk->rip == 0)
+    if (stk->rip == 0) {
       break;
+    }
     printf("panic: %llx\n", stk->rip);
     stk = stk->rbp;
   }
 
   printf("panic: call trace end, everything halted!\n");
-  disableInts();
+
   halt();
 }
 
 void panic(char* fmt, ...) {
+  disableInts();
+
   va_list va;
   va_start(va, fmt);
 
