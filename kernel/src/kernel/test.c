@@ -108,7 +108,7 @@ void test() {
 #endif
 #ifdef SLAB_TEST
   SlabCache testCache;
-  slabInitCache(&testCache, "test cache", 32);
+  slabInitCache(&testCache, "test cache", 32, 0);
 
   for (int i = 0; i < 102; i++) {
     void* allocated = slabAlloc(&testCache);
