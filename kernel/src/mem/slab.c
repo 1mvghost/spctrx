@@ -11,7 +11,12 @@
  * OBJ_NEXT_FREE macro
  */
 
-#define OBJ_NEXT_FREE(obj, objSize) *(u64*)((u64)obj + objSize - sizeof(u64))
+/**
+ * some helpful macros to make calculations easier
+ */
+#define SLAB_GET_OBJ(start, i, objSize) \
+  (void*)((u64)start + (objSize + sizeof(u64)) * (i))
+#define OBJ_NEXT_FREE(obj, objSize) *(u64*)((u64)obj + (objSize))
 
 void slabAllocSlab(SlabCache* cache) {
   ASSERT(cache != 0);
@@ -34,14 +39,14 @@ void slabAllocSlab(SlabCache* cache) {
    * initialize the slab's freelist
    */
   for (size_t i = 0; i < cache->objPerSlab - 1; i++) {
-    char* current = header->start + (i * cache->objSize);
-    char* next = current + cache->objSize;
-
-    OBJ_NEXT_FREE(current, cache->objSize) = (u64)next;
+    void* current = SLAB_GET_OBJ(header->start, i, cache->objSize);
 
     if (cache->initializer != 0) {
-      cache->initializer(current, cache->objSize - sizeof(u64));
+      cache->initializer(current, cache->objSize);
     }
+
+    OBJ_NEXT_FREE(current, cache->objSize) =
+        (u64)SLAB_GET_OBJ(header->start, i + 1, cache->objSize);
   }
 
   /*
@@ -91,6 +96,7 @@ void* slabAlloc(SlabCache* cache) {
 
   spinlockDrop(&cache->lock);
 
+  // printf("slab: allocated object addr %llx cache %s\n", result, cache->name);
   return result;
 }
 
@@ -128,7 +134,7 @@ void slabInitCache(SlabCache* cache,
   ASSERT(cache != 0);
   ASSERT(objSize > 0);
 
-  objSize = ALIGN_UP(objSize, 8) + sizeof(u64);
+  objSize = ALIGN_UP(objSize, 8);
 
   strncpy(cache->name, name, sizeof(cache->name) - 1);
 
@@ -139,7 +145,7 @@ void slabInitCache(SlabCache* cache,
   cache->objSize = objSize;
   cache->initializer = initializer;
 
-  cache->objPerSlab = (PAGE_SIZE - sizeof(Slab)) / objSize;
+  cache->objPerSlab = (PAGE_SIZE - sizeof(Slab)) / (objSize + sizeof(u64));
   ASSERT(cache->objPerSlab >= 1);
 
   spinlockInit(&cache->lock);
