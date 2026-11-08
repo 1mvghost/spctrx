@@ -4,6 +4,7 @@
 #include <fb.h>
 #include <gdt.h>
 #include <idt.h>
+#include <io.h>
 #include <irq.h>
 #include <isr.h>
 #include <limine.h>

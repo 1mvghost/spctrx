@@ -1,5 +1,6 @@
 #include <acpi.h>
 #include <boot.h>
+#include <io.h>
 #include <limine.h>
 #include <panic.h>
 #include <pci.h>

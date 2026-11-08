@@ -26,49 +26,6 @@ typedef uint64_t u64;
 
 #define UNUSED(param) (void)param
 
-static inline void out8(u16 port, u8 val) {
-  __asm__ volatile("outb %0, %1" : : "a"(val), "Nd"(port));
-}
-static inline void out16(u16 port, u16 val) {
-  __asm__ volatile("outw %0, %1" : : "a"(val), "Nd"(port));
-}
-static inline void out32(u16 port, u32 val) {
-  __asm__ volatile("outl %%eax, %%dx" : : "a"(val), "Nd"(port));
-}
-static inline u8 in8(u16 port) {
-  u8 ret;
-  __asm__ volatile("inb %1, %0" : "=a"(ret) : "Nd"(port) : "memory");
-  return ret;
-}
-static inline u16 in16(u16 port) {
-  u16 ret;
-  __asm__ volatile("inw %1, %0" : "=a"(ret) : "Nd"(port) : "memory");
-  return ret;
-}
-static inline u32 in32(u16 port) {
-  u32 ret;
-  __asm__ volatile("inl %%dx, %%eax" : "=a"(ret) : "Nd"(port) : "memory");
-  return ret;
-}
-static inline void ins32(u16 port, u32* buf, int q) {
-  int i = 0;
-  for (i = 0; i < q; i++) {
-    buf[i] = in32(port);
-  }
-}
-static inline u8 keypress() {
-  /* doesnt work on uefi real hardware :( */
-
-  /* clear any old data sitting there */
-  while ((in8(0x64) & 1) == 0) {
-  }
-  in8(0x60);
-
-  while ((in8(0x64) & 1) == 0) {
-  }
-  return in8(0x60);
-}
-
 static inline void disableInts() {
   asm volatile("cli");
 }

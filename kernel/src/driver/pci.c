@@ -1,4 +1,5 @@
 #include <ahci.h>
+#include <io.h>
 #include <pci.h>
 #include <printf.h>
 #include <slab.h>
