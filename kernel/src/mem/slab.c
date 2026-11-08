@@ -34,10 +34,14 @@ void slabAllocSlab(SlabCache* cache) {
    * initialize the slab's freelist
    */
   for (size_t i = 0; i < cache->objPerSlab - 1; i++) {
-    u64 current = (u64)header->start + (i * cache->objSize);
-    u64 next = current + cache->objSize;
+    char* current = header->start + (i * cache->objSize);
+    char* next = current + cache->objSize;
 
-    OBJ_NEXT_FREE(current, cache->objSize) = next;
+    OBJ_NEXT_FREE(current, cache->objSize) = (u64)next;
+
+    if (cache->initializer != 0) {
+      cache->initializer(current, cache->objSize - sizeof(u64));
+    }
   }
 
   /*
@@ -117,7 +121,10 @@ void slabFree(SlabCache* cache, void* addr) {
   spinlockDrop(&cache->lock);
 }
 
-void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
+void slabInitCache(SlabCache* cache,
+                   char* name,
+                   size_t objSize,
+                   SlabInitializer initializer) {
   ASSERT(cache != 0);
   ASSERT(objSize > 0);
 
@@ -130,6 +137,7 @@ void slabInitCache(SlabCache* cache, char* name, size_t objSize) {
   llInitHead(&cache->empty);
 
   cache->objSize = objSize;
+  cache->initializer = initializer;
 
   cache->objPerSlab = (PAGE_SIZE - sizeof(Slab)) / objSize;
   ASSERT(cache->objPerSlab >= 1);

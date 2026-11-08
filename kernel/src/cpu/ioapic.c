@@ -166,9 +166,9 @@ void ioApicMapISA(int isa, int vector) {
 }
 
 void ioApicInit() {
-  slabInitCache(&ioApicCache, "io apics", sizeof(IOAPIC));
-  slabInitCache(&isaOverrideCache, "io apic isa overrides",
-                sizeof(ISAOverride));
+  slabInitCache(&ioApicCache, "io apics", sizeof(IOAPIC), 0);
+  slabInitCache(&isaOverrideCache, "io apic isa overrides", sizeof(ISAOverride),
+                0);
 
   llInitHead(&ioApics);
   llInitHead(&isaOverrides);

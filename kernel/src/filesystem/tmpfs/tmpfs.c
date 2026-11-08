@@ -129,5 +129,5 @@ void tmpfsMount(FsMnt* mnt) {
 }
 
 void tmpfsInit() {
-  slabInitCache(&tmpfsNodeCache, "tmpfs nodes", sizeof(TmpfsNode));
+  slabInitCache(&tmpfsNodeCache, "tmpfs nodes", sizeof(TmpfsNode), 0);
 }

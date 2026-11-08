@@ -124,7 +124,7 @@ void pciEnum() {
 }
 
 void pciInit() {
-  slabInitCache(&pciDeviceCache, "pci devices", sizeof(PCIDevice));
+  slabInitCache(&pciDeviceCache, "pci devices", sizeof(PCIDevice), 0);
   llInitHead(&pciDevices);
 
   pciEnum();

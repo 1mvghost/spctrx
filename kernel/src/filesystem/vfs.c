@@ -159,8 +159,8 @@ void vfsDoMounts() {
 }
 
 void vfsInit() {
-  slabInitCache(&nodeCache, "vfs nodes", sizeof(FsNode));
-  slabInitCache(&mntCache, "vfs mounts", sizeof(FsMnt));
+  slabInitCache(&nodeCache, "vfs nodes", sizeof(FsNode), 0);
+  slabInitCache(&mntCache, "vfs mounts", sizeof(FsMnt), 0);
 
   llInitHead(&mnts);
 
