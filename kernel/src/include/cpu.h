@@ -83,9 +83,9 @@ void enableInts();
 void waitForInterrupt();
 void halt();
 
-void wrmsr(u32 msr, u64 value);
-u64 rdmsr(u32 msr);
-
 void cpuid(u32* eax, u32* ebx, u32* ecx, u32* edx);
+
+void cpuEarlyInit();
+void cpuApEarlyInit();
 
 #endif

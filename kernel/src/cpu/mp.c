@@ -1,7 +1,5 @@
 #include <boot.h>
 #include <cpu.h>
-#include <gdt.h>
-#include <idt.h>
 #include <lapic.h>
 #include <printf.h>
 
@@ -15,8 +13,7 @@ void mpEntry(struct limine_mp_info* mp) {
 
   disableInts();
 
-  gdtFlush();
-  idtFlush();
+  cpuApEarlyInit();
 
   lapicInit();
 

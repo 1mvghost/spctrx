@@ -3,8 +3,6 @@
 #include <boot.h>
 #include <cpu.h>
 #include <fb.h>
-#include <gdt.h>
-#include <idt.h>
 #include <io.h>
 #include <irq.h>
 #include <isr.h>
@@ -40,8 +38,8 @@ void main() {
   printf("spctrx v0.1 (www.github.com/1mvghost/spctrx)\n");
   printf("64-Bit Long Mode\n\n");
 
-  gdtInit();
-  idtInit();
+  cpuEarlyInit();
+
   isrInit();
 
   parseBootInfo();

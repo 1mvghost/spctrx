@@ -1,6 +1,6 @@
-#include <cpu.h>
 #include <io.h>
 #include <lapic.h>
+#include <msr.h>
 #include <printf.h>
 #include <util.h>
 #include <vmm.h>

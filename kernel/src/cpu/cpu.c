@@ -1,4 +1,8 @@
 #include <cpu.h>
+#include <gdt.h>
+#include <idt.h>
+#include <msr.h>
+#include <panic.h>
 
 void disableInts() {
   asm volatile("cli");
@@ -20,21 +24,23 @@ void halt() {
   }
 }
 
-void wrmsr(u32 msr, u64 value) {
-  u32 low = value & 0xFFFFFFFF;
-  u32 high = value >> 32;
-
-  asm volatile("wrmsr" : : "c"(msr), "a"(low), "d"(high) : "memory");
-}
-
-u64 rdmsr(u32 msr) {
-  u32 low, high;
-
-  asm volatile("rdmsr" : "=a"(low), "=d"(high) : "c"(msr));
-
-  return ((u64)high << 32) | low;
-}
-
 void cpuid(u32* eax, u32* ebx, u32* ecx, u32* edx) {
   asm volatile("cpuid" : "=b"(*ebx), "=c"(*ecx), "=d"(*edx) : "a"(*eax));
+}
+
+void cpuEarlyInit() {
+  gdtInit();
+  idtInit();
+
+  /**
+   * check for msr support
+   */
+  if (!msrCheckSupport()) {
+    panic("msr not supported!\n");
+  }
+}
+
+void cpuApEarlyInit() {
+  gdtFlush();
+  idtFlush();
 }
