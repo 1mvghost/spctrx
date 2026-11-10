@@ -15,7 +15,7 @@ TMP_DIRS=$(patsubst %, $(BUILD)/%, $(SRC_DIRS))
 
 # tools
 
-TOOLCHAIN=x86_64-elf
+TOOLCHAIN=x86_64-spctrx
 
 CC=$(TOOLCHAIN)-gcc
 LD=$(TOOLCHAIN)-ld
@@ -27,7 +27,6 @@ FORMAT=clang-format
 CC_FLAGS=\
 	-I$(INCLUDE)/ \
 	-I$(LIBS)/flanterm/src/ \
-	-static \
 	-pipe \
 	-g \
 	-O2 \
@@ -55,12 +54,9 @@ CC_FLAGS=\
 	-fdata-sections
 
 LD_FLAGS=\
-	-m elf_x86_64 \
 	-T link.ld \
 	-nostdlib \
-	-static \
 	-z noexecstack \
-	-z max-page-size=4096 \
     --gc-sections
 
 ASM_FLAGS=\

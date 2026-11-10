@@ -1,0 +1,146 @@
+diff --git a/bfd/config.bfd b/bfd/config.bfd
+index 9900e5c7470..ea959c0f086 100644
+--- a/bfd/config.bfd
++++ b/bfd/config.bfd
+@@ -568,7 +568,7 @@ case "${targ}" in
+     targ_selvecs="i386_elf32_vec x86_64_elf64_sol2_vec x86_64_elf64_vec"
+     want64=true
+     ;;
+-  i[3-7]86-*-dicos* | i[3-7]86-*-dragonfly* |  i[3-7]86-*-netbsd* | i[3-7]86-*-knetbsd*-gnu | i[3-7]86-*-redox*)
++  i[3-7]86-*-dicos* | i[3-7]86-*-dragonfly* |  i[3-7]86-*-netbsd* | i[3-7]86-*-knetbsd*-gnu | i[3-7]86-*-redox* | i[3-7]86-*-spctrx*)
+     targ_defvec=i386_elf32_vec
+     targ64_selvecs="x86_64_elf64_vec"
+     ;;
+@@ -1333,7 +1333,7 @@ case "${targ}" in
+     targ_archs="$targ_archs bfd_powerpc_arch bfd_rs6000_arch"
+     want64=true
+     ;;
+-  x86_64-*-dicos* | x86_64-*-dragonfly* | x86_64-*-haiku* | x86_64-*-redox*)
++  x86_64-*-dicos* | x86_64-*-dragonfly* | x86_64-*-haiku* | x86_64-*-redox* | x86_64-*-spctrx*)
+     targ_defvec=x86_64_elf64_vec
+     targ_selvecs="i386_elf32_vec"
+     want64=true
+diff --git a/config.sub b/config.sub
+index 3d35cde174d..c356b06ff7f 100755
+--- a/config.sub
++++ b/config.sub
+@@ -2114,6 +2114,7 @@ case $os in
+ 	| solaris* \
+ 	| solidbsd* \
+ 	| sortix* \
++	| spctrx* \
+ 	| storm-chaos* \
+ 	| sunos \
+ 	| sunos[34]* \
+diff --git a/gas/configure.tgt b/gas/configure.tgt
+index ba3d1194ae9..9399322b029 100644
+--- a/gas/configure.tgt
++++ b/gas/configure.tgt
+@@ -227,6 +227,7 @@ case ${generic_target} in
+ 
+   i386-*-elfiamcu)			fmt=elf arch=iamcu ;;
+   i386-*-elf*)				fmt=elf ;;
++  i386-*-spctrx*)				fmt=elf ;;
+   i386-*-fuchsia*)			fmt=elf ;;
+   i386-*-haiku*)			fmt=elf em=haiku ;;
+   i386-*-genode*)			fmt=elf ;;
+diff --git a/ld/Makefile.am b/ld/Makefile.am
+index b6244d08c8b..325a1392e6b 100644
+--- a/ld/Makefile.am
++++ b/ld/Makefile.am
+@@ -281,6 +281,7 @@ ALL_EMULATION_SOURCES = \
+ 	eelf_i386_haiku.c \
+ 	eelf_i386_sol2.c \
+ 	eelf_i386_vxworks.c \
++	eelf_i386_spctrx.c \
+ 	eelf_iamcu.c \
+ 	eelf_s390.c \
+ 	eh8300elf.c \
+@@ -454,6 +455,7 @@ ALL_64_EMULATION_SOURCES = \
+ 	eelf64tilegx_be.c \
+ 	eelf_mipsel_haiku.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_spctrx.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_haiku.c \
+ 	eelf_x86_64_sol2.c \
+diff --git a/ld/Makefile.in b/ld/Makefile.in
+index 60f0264d046..57c9d5c8a45 100644
+--- a/ld/Makefile.in
++++ b/ld/Makefile.in
+@@ -796,6 +796,7 @@ ALL_EMULATION_SOURCES = \
+ 	eelf_i386_haiku.c \
+ 	eelf_i386_sol2.c \
+ 	eelf_i386_vxworks.c \
++	eelf_i386_spctrx.c \
+ 	eelf_iamcu.c \
+ 	eelf_s390.c \
+ 	eh8300elf.c \
+@@ -968,6 +969,7 @@ ALL_64_EMULATION_SOURCES = \
+ 	eelf64tilegx_be.c \
+ 	eelf_mipsel_haiku.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_spctrx.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_haiku.c \
+ 	eelf_x86_64_sol2.c \
+@@ -1470,6 +1472,7 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_haiku.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_sol2.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_spctrx.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_vxworks.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_iamcu.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_mipsel_haiku.Po@am__quote@
+@@ -1478,6 +1481,7 @@ distclean-compile:
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_fbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_haiku.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_sol2.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_spctrx.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eh8300elf.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eh8300elf_linux.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eh8300helf.Po@am__quote@
+diff --git a/ld/configure.tgt b/ld/configure.tgt
+index 55eb6e94b84..ed22599867c 100644
+--- a/ld/configure.tgt
++++ b/ld/configure.tgt
+@@ -420,6 +420,11 @@ i[3-7]86-*-vxworks*)	targ_emul=elf_i386_vxworks
+ 			;;
+ i[3-7]86-*-chaos)	targ_emul=elf_i386_chaos
+ 			;;
++i[3-7]86-*-spctrx*)
++			targ_emul=elf_i386_spctrx
++			targ_extra_emuls=elf_i386
++			targ64_extra_emuls="elf_x86_64_spctrx elf_x86_64"
++			;;
+ ia16-*-elf*)		targ_emul=elf_i386
+ 			targ_extra_emuls=i386msdos
+ 			;;
+@@ -964,6 +969,10 @@ x86_64-*-elf* | x86_64-*-rtems* | x86_64-*-fuchsia* | x86_64-*-genode*)
+ x86_64-*-dragonfly*)	targ_emul=elf_x86_64
+ 			targ_extra_emuls="elf_i386"
+ 			;;
++x86_64-*-spctrx*)
++			targ_emul=elf_x86_64_spctrx
++			targ_extra_emuls="elf_i386_spctrx elf_x86_64 elf_i386"
++			;;
+ x86_64-*-freebsd* | x86_64-*-kfreebsd*-gnu)
+ 			targ_emul=elf_x86_64_fbsd
+ 			targ_extra_emuls="elf_x86_64 elf_i386"
+diff --git a/ld/emulparams/elf_i386_spctrx.sh b/ld/emulparams/elf_i386_spctrx.sh
+new file mode 100644
+index 00000000000..08cd1ff020d
+--- /dev/null
++++ b/ld/emulparams/elf_i386_spctrx.sh
+@@ -0,0 +1,2 @@
++source_sh ${srcdir}/emulparams/elf_i386.sh
++TEXT_START_ADDR=0x08000000
+\ No newline at end of file
+diff --git a/ld/emulparams/elf_x86_64_spctrx.sh b/ld/emulparams/elf_x86_64_spctrx.sh
+new file mode 100644
+index 00000000000..1138d5551cb
+--- /dev/null
++++ b/ld/emulparams/elf_x86_64_spctrx.sh
+@@ -0,0 +1 @@
++source_sh ${srcdir}/emulparams/elf_x86_64.sh
+\ No newline at end of file

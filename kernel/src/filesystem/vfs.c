@@ -6,7 +6,6 @@
 #include <tmpfs.h>
 #include <vfs.h>
 #include <vfsops.h>
-#include <vmm.h>
 
 static LLHead mnts;
 static FsNode* root;
