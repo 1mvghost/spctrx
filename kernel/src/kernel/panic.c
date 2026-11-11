@@ -1,9 +1,12 @@
 #include <cpu.h>
+#include <log.h>
 #include <panic.h>
 #include <printf.h>
 #include <stdarg.h>
 #include <string.h>
 #include <util.h>
+
+#define DEBUG(fmt, ...) dprintf("panic", fmt, __VA_ARGS__)
 
 static const char* exceptions[32] = {"Div By Zero",
                                      "Debug",
@@ -37,29 +40,29 @@ static const char* exceptions[32] = {"Div By Zero",
                                      "Unknown"};
 
 void panicIsr(Regs* regs) {
-  printf("panic: kernel exception!\n");
-  printf("panic: %s\n", exceptions[regs->intId]);
-  printf("panic: err %016llx int %016llx\n", regs->errId, regs->intId);
-  printf("panic: rax %016llx r8  %016llx\n", regs->rax, regs->r8);
-  printf("panic: rbx %016llx r9  %016llx\n", regs->rbx, regs->r9);
-  printf("panic: rcx %016llx r10 %016llx\n", regs->rcx, regs->r10);
-  printf("panic: rdx %016llx r11 %016llx\n", regs->rdx, regs->r11);
-  printf("panic: rsi %016llx r12 %016llx\n", regs->rsi, regs->r12);
-  printf("panic: rdi %016llx r13 %016llx\n", regs->rdi, regs->r13);
-  printf("panic: rsp %016llx r14 %016llx\n", regs->rsp, regs->r14);
-  printf("panic: rip %016llx r15 %016llx\n", regs->rip, regs->r15);
-  printf("panic: rfl %016llx\n", regs->rFlags);
-  printf("panic: cs  %016llx ss  %016llx\n", regs->cs, regs->ss);
-  printf("panic: kRsp %016llx\n", regs->kRsp);
+  DEBUG("kernel exception!\n", "");
+  DEBUG("%s\n", exceptions[regs->intId]);
+  DEBUG("err %016llx int %016llx\n", regs->errId, regs->intId);
+  DEBUG("rax %016llx r8  %016llx\n", regs->rax, regs->r8);
+  DEBUG("rbx %016llx r9  %016llx\n", regs->rbx, regs->r9);
+  DEBUG("rcx %016llx r10 %016llx\n", regs->rcx, regs->r10);
+  DEBUG("rdx %016llx r11 %016llx\n", regs->rdx, regs->r11);
+  DEBUG("rsi %016llx r12 %016llx\n", regs->rsi, regs->r12);
+  DEBUG("rdi %016llx r13 %016llx\n", regs->rdi, regs->r13);
+  DEBUG("rsp %016llx r14 %016llx\n", regs->rsp, regs->r14);
+  DEBUG("rip %016llx r15 %016llx\n", regs->rip, regs->r15);
+  DEBUG("rfl %016llx\n", regs->rFlags);
+  DEBUG("cs  %016llx ss  %016llx\n", regs->cs, regs->ss);
+  DEBUG("kRsp %016llx\n", regs->kRsp);
   panic("");
 }
 
 void doPanic(char* err) {
   if (*err != '\0') {
-    printf("panic: %s", err);
+    DEBUG("%s", err);
   }
 
-  printf("panic: --- Kernel Call Trace ---\n");
+  DEBUG("--- Kernel Call Trace ---\n", "");
 
   struct Stacktrace* stk;
   asm("movq %%rbp,%0" : "=r"(stk)::);
@@ -68,11 +71,11 @@ void doPanic(char* err) {
     if (stk->rip == 0) {
       break;
     }
-    printf("panic: %llx\n", stk->rip);
+    DEBUG("%llx\n", stk->rip);
     stk = stk->rbp;
   }
 
-  printf("panic: call trace end, everything halted!\n");
+  DEBUG("call trace end, everything halted!\n", "");
 
   halt();
 }

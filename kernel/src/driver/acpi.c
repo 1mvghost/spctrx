@@ -3,6 +3,7 @@
 #include <cpu.h>
 #include <io.h>
 #include <limine.h>
+#include <log.h>
 #include <panic.h>
 #include <pci.h>
 #include <pmm.h>
@@ -13,6 +14,8 @@
 /**
  * TODO: uacpi
  */
+
+#define DEBUG(fmt, ...) dprintf("acpi", fmt, __VA_ARGS__)
 
 __attribute__((
     used,
@@ -149,7 +152,7 @@ void acpiFadt() {
         s5++;
       SLP_TYPb = *(s5) << 10;
     } else {
-      printf("acpi: FAILED TO FIND S5, SHUTDOWN WONT BE POSSIBLE :(\n");
+      DEBUG("FAILED TO FIND S5, SHUTDOWN WONT BE POSSIBLE :(\n", "");
     }
   }
 }
@@ -168,8 +171,8 @@ void acpiRsdt() {
   for (u32 i = 0; i < (rsdt->h.length - sizeof(rsdt->h)) / 4; i++) {
     void* a = vmmPhysToVirt(rsdt->sdtPtr[i]);
     SDTHeader* h = (SDTHeader*)a;
-    printf("acpi: FOUND TABLE: %c%c%c%c (%x)\n", h->signature[0],
-           h->signature[1], h->signature[2], h->signature[3], a);
+    DEBUG("FOUND TABLE: %c%c%c%c (%x)\n", h->signature[0], h->signature[1],
+          h->signature[2], h->signature[3], a);
   }
 }
 void acpiReboot() {
@@ -193,9 +196,9 @@ void acpiInit() {
   rsdp = (RSDP*)rsdpRequest.response->address;
   rsdt = (RSDT*)vmmPhysToVirt(rsdp->rsdt);
 
-  printf("acpi: ACPI OEM: %c%c%c%c%c%c\n", rsdp->oemId[0], rsdp->oemId[1],
-         rsdp->oemId[2], rsdp->oemId[3], rsdp->oemId[4], rsdp->oemId[5]);
-  printf("acpi: RSDT ADDR: %x\n", rsdp->rsdt);
+  DEBUG("ACPI OEM: %c%c%c%c%c%c\n", rsdp->oemId[0], rsdp->oemId[1],
+        rsdp->oemId[2], rsdp->oemId[3], rsdp->oemId[4], rsdp->oemId[5]);
+  DEBUG("RSDT ADDR: %x\n", rsdp->rsdt);
 
   acpiRsdt();
 

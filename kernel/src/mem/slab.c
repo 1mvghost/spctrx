@@ -1,8 +1,10 @@
 #include <assert.h>
-#include <printf.h>
+#include <log.h>
 #include <slab.h>
 #include <string.h>
 #include <vmm.h>
+
+#define DEBUG(fmt, ...) dprintf("slab", fmt, __VA_ARGS__)
 
 /**
  * the objects in a slab will be in the following format:
@@ -54,8 +56,8 @@ void slabAllocSlab(SlabCache* cache) {
    */
   llInsertFront(&cache->empty, &header->head);
 
-  printf("slab: new slab for %s at %llx start:%llx firstfree:%llx\n",
-         cache->name, header, header->start, header->firstFree);
+  DEBUG("new slab for %s at %llx start:%llx firstfree:%llx\n", cache->name,
+        header, header->start, header->firstFree);
 }
 
 void* slabAlloc(SlabCache* cache) {
@@ -96,7 +98,7 @@ void* slabAlloc(SlabCache* cache) {
 
   spinlockDrop(&cache->lock);
 
-  // printf("slab: allocated object addr %llx cache %s\n", result, cache->name);
+  // DEBUG("allocated object addr %llx cache %s\n", result, cache->name);
   return result;
 }
 
@@ -150,6 +152,6 @@ void slabInitCache(SlabCache* cache,
 
   spinlockInit(&cache->lock);
 
-  printf("slab: new cache %s (%llx) objsize:%lld objperslab:%lld\n", name,
-         cache, objSize, cache->objPerSlab);
+  DEBUG("new cache %s (%llx) objsize:%lld objperslab:%lld\n", name, cache,
+        objSize, cache->objPerSlab);
 }

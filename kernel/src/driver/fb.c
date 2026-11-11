@@ -1,7 +1,8 @@
 #include <fb.h>
+#include <log.h>
 #include <panic.h>
-#include <printf.h>
-#include <util.h>
+
+#define DEBUG(fmt, ...) dprintf("fb", fmt, __VA_ARGS__)
 
 __attribute__((
     used,
@@ -23,6 +24,5 @@ void fbInit() {
 
   fb = framebufferRequest.response->framebuffers[0];
 
-  printf("fb: PITCH:%d HEIGHT:%d ADDR:%x\n", fb->pitch, fb->height,
-         fb->address);
+  DEBUG("PITCH:%d HEIGHT:%d ADDR:%x\n", fb->pitch, fb->height, fb->address);
 }

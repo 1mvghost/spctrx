@@ -1,11 +1,13 @@
 #include <devfs.h>
 #include <ll.h>
-#include <printf.h>
+#include <log.h>
 #include <slab.h>
 #include <string.h>
 #include <tmpfs.h>
 #include <vfs.h>
 #include <vfsops.h>
+
+#define DEBUG(fmt, ...) dprintf("vfs", fmt, __VA_ARGS__)
 
 static LLHead mnts;
 static FsNode* root;
@@ -119,7 +121,7 @@ bool vfsMount(char* path, char* dev, char* type) {
   FsNode* lookedUp = vfsLookup(path);
 
   if (!lookedUp) {
-    printf("vfs: cannot mount on nonexistent path %s\n", path);
+    DEBUG("cannot mount on nonexistent path %s\n", path);
     return false;
   }
 
@@ -144,7 +146,7 @@ bool vfsMount(char* path, char* dev, char* type) {
 
   llInsertFront(&mnts, &mnt->head);
 
-  printf("vfs: mounted %s fs %s\n", path, type);
+  DEBUG("mounted %s fs %s\n", path, type);
 
   return true;
 }

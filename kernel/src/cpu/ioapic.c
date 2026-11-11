@@ -1,9 +1,12 @@
 #include <acpi.h>
 #include <ioapic.h>
+#include <log.h>
 #include <panic.h>
 #include <printf.h>
 #include <slab.h>
 #include <vmm.h>
+
+#define DEBUG(fmt, ...) dprintf("ioapic", fmt, __VA_ARGS__)
 
 static LLHead ioApics;
 static LLHead isaOverrides;
@@ -37,8 +40,8 @@ void ioApicAdd(int id, u64 ioAddr, u32 baseGsi) {
   llInitHead(&ioApic->head);
   llInsertFront(&ioApics, &ioApic->head);
 
-  printf("ioapic: new io apic ioaddr %llx gsistart %d gsiend %d\n",
-         ioApic->ioAddr, ioApic->gsiStart, ioApic->gsiEnd);
+  DEBUG("new io apic ioaddr %llx gsistart %d gsiend %d\n", ioApic->ioAddr,
+        ioApic->gsiStart, ioApic->gsiEnd);
 }
 
 void ioApicParseMadt() {
@@ -77,8 +80,8 @@ void ioApicParseMadt() {
 
       llInsertFront(&isaOverrides, &override->head);
 
-      printf("ioapic: new override for isa %d -> gsi %d flags %x\n",
-             override->isaSource, override->gsi, override->flags);
+      DEBUG("new override for isa %d -> gsi %d flags %x\n", override->isaSource,
+            override->gsi, override->flags);
     }
 
     ptr += ent->entryLength;
@@ -136,7 +139,7 @@ void ioApicMap(u32 gsi, int vector, u16 polarity, u16 trigger) {
 
   ioApicWriteRedirEntry(ioApic, gsi - ioApic->gsiStart, vector, 0, 0, 0,
                         polarity, trigger, 0, 0);
-  printf("ioapic: mapped gsi %d to vector %d\n", gsi, vector);
+  DEBUG("mapped gsi %d to vector %d\n", gsi, vector);
 }
 
 void ioApicMapISA(int isa, int vector) {

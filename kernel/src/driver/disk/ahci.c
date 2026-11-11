@@ -1,8 +1,10 @@
 #include <ahci.h>
+#include <log.h>
 #include <pmm.h>
-#include <printf.h>
 #include <string.h>
 #include <vmm.h>
+
+#define DEBUG(fmt, ...) dprintf("ahci", fmt, __VA_ARGS__)
 
 #define FIS_TYPE_REG_H2D 0x27
 
@@ -197,7 +199,7 @@ int ahciCmdFindFree(HbaPort* port) {
     }
     slots >>= 1;
   }
-  printf("ahci: CANNOT FIND FREE CMD SLOT\n");
+  DEBUG("CANNOT FIND FREE CMD SLOT\n", "");
   return -1;
 }
 int ahciCheckType(HbaPort* port) {
@@ -230,7 +232,7 @@ bool ahciSendCommand(HbaPort* port) {
     spin++;
   }
   if (spin == wait) {
-    printf("ahci: PORT HUNG\n");
+    DEBUG("PORT HUNG\n", "");
     return false;
   }
 
@@ -240,7 +242,7 @@ bool ahciSendCommand(HbaPort* port) {
   }
 
   if (port->is & HBA_PxIS_TFES) {
-    printf("ahci: ERROR\n");
+    DEBUG("ERROR\n", "");
     return false;
   }
 
@@ -253,7 +255,7 @@ bool ahciReadOrWrite(int p, u64 lba, u32 sectAmount, void* buf, bool write) {
 
   int slot = ahciCmdFindFree(port);
   if (slot == -1) {
-    printf("ahci: no free slots right now\n");
+    DEBUG("no free slots right now\n", "");
     return false;
   }
 
@@ -315,14 +317,14 @@ void ahciEnum() {
     if (pi & 1) {
       int type = ahciCheckType(&base->ports[i]);
       if (type == AHCI_DEV_SATA) {
-        printf("ahci: SATA drive found at port %d\n", i);
+        DEBUG("SATA drive found at port %d\n", i);
         ahciRebase(&base->ports[i]);
       } else if (type == AHCI_DEV_SATAPI) {
-        printf("ahci: SATAPI drive found at port %d\n", i);
+        DEBUG("SATAPI drive found at port %d\n", i);
       } else if (type == AHCI_DEV_SEMB) {
-        printf("ahci: SEMB drive found at port %d\n", i);
+        DEBUG("SEMB drive found at port %d\n", i);
       } else if (type == AHCI_DEV_PM) {
-        printf("ahci: PM drive found at port %d\n", i);
+        DEBUG("PM drive found at port %d\n", i);
       }
     }
     pi >>= 1;
@@ -330,7 +332,7 @@ void ahciEnum() {
 }
 void ahciInit(u64 bar5) {
   if (base != 0) {
-    printf("ahci: more than 1 controller is not supported yet\n");
+    DEBUG("more than 1 controller is not supported yet\n", "");
     return;
   }
   vmmMapMMIO(bar5, 1);

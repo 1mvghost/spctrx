@@ -1,9 +1,11 @@
 #include <io.h>
 #include <lapic.h>
+#include <log.h>
 #include <msr.h>
-#include <printf.h>
 #include <util.h>
 #include <vmm.h>
+
+#define DEBUG(fmt, ...) dprintf("lapic", fmt, __VA_ARGS__)
 
 void lapicSetBase(u64 base) {
   base |= IA32_APIC_BASE_MSR_ENABLE;
@@ -55,6 +57,6 @@ void lapicInit() {
    */
   lapicWriteReg(LAPIC_REGSPI, lapicReadReg(LAPIC_REGSPI) | 0x100);
 
-  printf("lapic: base %llx regver %x regid %x\n", lapicGetBase(),
-         lapicReadReg(LAPIC_REGVER), lapicReadReg(LAPIC_REGID));
+  DEBUG("base %llx regver %x regid %x\n", lapicGetBase(),
+        lapicReadReg(LAPIC_REGVER), lapicReadReg(LAPIC_REGID));
 }

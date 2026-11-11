@@ -1,10 +1,12 @@
 #include <fb.h>
-#include <printf.h>
+#include <log.h>
 #include <term.h>
 #include <util.h>
 
 #include <flanterm.h>
 #include <flanterm_backends/fb.h>
+
+#define DEBUG(fmt, ...) dprintf("term", fmt, __VA_ARGS__)
 
 #define FONT_WIDTH 8
 #define FONT_HEIGHT 16
@@ -371,7 +373,7 @@ void termInit() {
       0, true);
 
   if (flantermCtx == 0) {
-    printf("term: failed to initialize flanterm!\n");
+    DEBUG("failed to initialize flanterm!\n", "");
     return;
   }
 

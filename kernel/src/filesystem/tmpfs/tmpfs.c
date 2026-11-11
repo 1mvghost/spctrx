@@ -1,8 +1,10 @@
-#include <printf.h>
+#include <log.h>
 #include <slab.h>
 #include <string.h>
 #include <tmpfs.h>
 #include <vmm.h>
+
+#define DEBUG(fmt, ...) dprintf("tmpfs", fmt, __VA_ARGS__)
 
 /**
  * todo: get rid of this
@@ -38,7 +40,7 @@ FsNode* tmpfsAllocNode(FsMnt* mnt, char* name, int type) {
 
   node->fsData = tmpfsNode;
 
-  printf("tmpfs: new node for %s name %s type %d\n", mnt->path, name, type);
+  DEBUG("new node for %s name %s type %d\n", mnt->path, name, type);
 
   return node;
 }
@@ -125,7 +127,7 @@ FsNode* tmpfsLookup(FsNode* n, char* name) {
 void tmpfsMount(FsMnt* mnt) {
   mnt->root = tmpfsAllocNode(mnt, "", TYPE_DIR);
 
-  printf("tmpfs: new mnt %s\n", mnt->path);
+  DEBUG("new mnt %s\n", mnt->path);
 }
 
 void tmpfsInit() {

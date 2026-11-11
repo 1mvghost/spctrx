@@ -1,12 +1,14 @@
 #include <assert.h>
 #include <bitmap.h>
 #include <boot.h>
+#include <log.h>
 #include <panic.h>
 #include <pmm.h>
-#include <printf.h>
 #include <spinlock.h>
 #include <string.h>
 #include <vmm.h>
+
+#define DEBUG(fmt, ...) dprintf("pmm", fmt, __VA_ARGS__)
 
 __attribute__((
     used,
@@ -97,7 +99,7 @@ void pmmInit() {
     panic("not enough memory for the pmm bitmap!\n");
   }
 
-  printf("pmm: bitmap addr %llx\n", bitmapAddr);
+  DEBUG("bitmap addr %llx\n", bitmapAddr);
 
   bitmapInit(&pmmBitmap, last / PAGE_SIZE, vmmPhysToVirt(bitmapAddr));
   bitmapFillAll(&pmmBitmap, true);

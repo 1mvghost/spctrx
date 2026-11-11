@@ -1,5 +1,7 @@
 #include <boot.h>
-#include <printf.h>
+#include <log.h>
+
+#define DEBUG(fmt, ...) dprintf("boot", fmt, __VA_ARGS__)
 
 __attribute__((
     used,
@@ -31,14 +33,13 @@ u64 getHHDM() {
 
 void parseBootInfo() {
   if (moduleRequest.response == 0) {
-    printf("boot: no modules found\n");
+    DEBUG("no modules found\n", "");
     return;
   }
 
   struct limine_file** modules = moduleRequest.response->modules;
 
   for (u64 i = 0; i < moduleRequest.response->module_count; i++) {
-    printf("boot: found module %s addr %llx\n", modules[i]->path,
-           modules[i]->address);
+    DEBUG("found module %s addr %llx\n", modules[i]->path, modules[i]->address);
   }
 }

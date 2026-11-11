@@ -1,8 +1,11 @@
 #include <devfs.h>
+#include <log.h>
 #include <printf.h>
 #include <serial.h>
 #include <string.h>
 #include <tmpfs.h>
+
+#define DEBUG(fmt, ...) dprintf("devfs", fmt, __VA_ARGS__)
 
 /**
  * this is really just a wrapper for tmpfs for now.
@@ -42,7 +45,7 @@ int devfsWrite(FsNode* n, u64 pos, void* buf, size_t size) {
 
 void devfsCreateDev(FsMnt* mnt, char* name) {
   if (tmpfsCreate(mnt->root, name) < 0) {
-    printf("devfs: tmpfs bug, node creation failed!\n");
+    DEBUG("tmpfs bug, node creation failed!\n", "");
     return;
   }
 
@@ -50,7 +53,7 @@ void devfsCreateDev(FsMnt* mnt, char* name) {
   node->ops = &devfsHandler;
 
   if (tmpfsWrite(node, 0, name, sizeof(name)) < 0) {
-    printf("devfs: tmpfs bug, write to created node failed!\n");
+    DEBUG("tmpfs bug, write to created node failed!\n", "");
   }
 }
 
@@ -60,5 +63,5 @@ void devfsMount(FsMnt* mnt) {
 
   devfsCreateDev(mnt, "tty");
 
-  printf("devfs: new mnt %s\n", mnt->path);
+  DEBUG("new mnt %s\n", mnt->path);
 }

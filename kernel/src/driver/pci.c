@@ -1,8 +1,10 @@
 #include <ahci.h>
 #include <io.h>
+#include <log.h>
 #include <pci.h>
-#include <printf.h>
 #include <slab.h>
+
+#define DEBUG(fmt, ...) dprintf("pci", fmt, __VA_ARGS__)
 
 static char* class[32] = {"Unknown",
                           "Mass Storage Controller",
@@ -106,8 +108,8 @@ void pciCheckDevice(u32 busId, u32 devId) {
       llInitHead(&dev->head);
       pciReadDeviceData(busId, devId, func, dev);
 
-      printf("pci: %02d:%02d.%02d subclass %02x vendor %04x [%s]\n", busId,
-             devId, func, dev->subclass, dev->vendor, class[dev->classcode]);
+      DEBUG("%02d:%02d.%02d subclass %02x vendor %04x [%s]\n", busId, devId,
+            func, dev->subclass, dev->vendor, class[dev->classcode]);
 
       llInsertFront(&pciDevices, &dev->head);
 
