@@ -1,0 +1,128 @@
+diff --git a/config.sub b/config.sub
+index 38f3d037a78..c3258b38796 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1742,7 +1742,7 @@ case $os in
+ 	     | interix* | uwin* | mks* | rhapsody* | darwin* \
+ 	     | openstep* | oskit* | conix* | pw32* | nonstopux* \
+ 	     | storm-chaos* | tops10* | tenex* | tops20* | its* \
+-	     | os2* | vos* | palmos* | uclinux* | nucleus* | morphos* \
++	     | os2* | vos* | palmos* | uclinux* | nucleus* | spctrx* | morphos* \
+ 	     | scout* | superux* | sysv* | rtmk* | tpf* | windiss* \
+ 	     | powermax* | dnix* | nx6 | nx7 | sei* | dragonfly* \
+ 	     | skyos* | haiku* | rdos* | toppers* | drops* | es* \
+diff --git a/fixincludes/mkfixinc.sh b/fixincludes/mkfixinc.sh
+index 7112f4dcd64..dcb9ab01d5c 100755
+--- a/fixincludes/mkfixinc.sh
++++ b/fixincludes/mkfixinc.sh
+@@ -13,6 +13,8 @@ target=fixinc.sh
+ case $machine in
+     i?86-*-cygwin* | \
+     *-mingw32* | \
++    *-spctrx* | \
++    *-*-spctrx* | \
+     powerpc-*-eabisim* | \
+     powerpc-*-eabi*    | \
+     powerpc-*-rtems*   | \
+diff --git a/gcc/config.gcc b/gcc/config.gcc
+index d5fdbd0b864..bfd8e124741 100644
+--- a/gcc/config.gcc
++++ b/gcc/config.gcc
+@@ -946,6 +946,13 @@ case ${target} in
+   rust_target_objs="${rust_target_objs} fuchsia-rust.o"
+   target_has_targetrustm=yes
+   ;;
++*-*-spctrx*)
++  extra_options="$extra_options gnu-user.opt"
++  gas=yes
++  gnu_ld=yes
++  default_use_cxa_atexit=yes
++  use_gcc_stdint=provide
++  ;;
+ *-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-gnu* | *-*-kopensolaris*-gnu | *-*-uclinuxfdpiceabi)
+   extra_options="$extra_options gnu-user.opt"
+   case ${enable_threads} in
+@@ -2150,6 +2157,12 @@ x86_64-*-linux* | x86_64-*-kfreebsd*-gnu | x86_64-*-gnu*)
+ 	done
+ 	TM_MULTILIB_CONFIG=`echo $TM_MULTILIB_CONFIG | sed 's/^,//'`
+ 	;;
++i[34567]86-*-spctrx*)
++    tm_file="${tm_file} i386/unix.h i386/att.h elfos.h glibc-stdint.h i386/i386elf.h spctrx.h gnu-user.h"
++    ;;
++x86_64-*-spctrx*)
++    tm_file="${tm_file} i386/unix.h i386/att.h elfos.h glibc-stdint.h i386/i386elf.h i386/x86-64.h spctrx.h gnu-user.h"
++    ;;
+ i[34567]86-pc-msdosdjgpp*)
+ 	xm_file=i386/xm-djgpp.h
+ 	tm_file="${tm_file} i386/unix.h i386/bsd.h i386/gas.h i386/djgpp.h i386/djgpp-stdint.h"
+diff --git a/libgcc/config.host b/libgcc/config.host
+index ba44a49cc0e..c9d7570b648 100644
+--- a/libgcc/config.host
++++ b/libgcc/config.host
+@@ -858,6 +858,14 @@ i[34567]86-*-cygwin*)
+ 	fi
+ 	tmake_file="${tmake_file} ${tmake_eh_file} ${tmake_dlldir_file} i386/t-slibgcc-cygming i386/t-cygming i386/t-cygwin t-crtfm i386/t-chkstk t-dfprules"
+ 	;;
++i[34567]86-*-spctrx*)
++	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o"
++	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
++	;;
++x86_64-*-spctrx*)
++	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o"
++	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
++	;;
+ x86_64-*-cygwin*)
+ 	extra_parts="crtbegin.o crtbeginS.o crtend.o crtfastmath.o"
+ 	if test x$enable_vtable_verify = xyes; then
+diff --git a/libstdc++-v3/crossconfig.m4 b/libstdc++-v3/crossconfig.m4
+index c94f5719075..e04cc155e14 100644
+--- a/libstdc++-v3/crossconfig.m4
++++ b/libstdc++-v3/crossconfig.m4
+@@ -140,6 +140,13 @@ case "${host}" in
+     SECTION_FLAGS='-ffunction-sections -fdata-sections'
+     AC_SUBST(SECTION_FLAGS)
+     ;;
++  
++  *-spctrx*)
++    GLIBCXX_CHECK_COMPILER_FEATURES
++    GLIBCXX_CHECK_LINKER_FEATURES
++    GLIBCXX_CHECK_MATH_SUPPORT
++    GLIBCXX_CHECK_STDLIB_SUPPORT
++    ;;
+ 
+   *-hpux*)
+     SECTION_FLAGS='-ffunction-sections -fdata-sections'
+diff --git a/gcc/config/spctrx.h b/gcc/config/spctrx.h
+new file mode 100644
+index 00000000000..28e08545ffd
+--- /dev/null
++++ b/gcc/config/spctrx.h
+@@ -0,0 +1,28 @@
++/* Useful if you wish to make target-specific GCC changes. */
++#undef TARGET_SPCTRX
++#define TARGET_SPCTRX 1
++
++/* Default arguments you want when running your
++   i686-myos-gcc/x86_64-myos-gcc toolchain */
++#undef LIB_SPEC
++#define LIB_SPEC "-lc %{shared:-shared} %{static:-static} %{!shared: %{!static: %{rdynamic:-export-dynamic}}} -z max-page-size=4096" /* link against C standard library */
++
++/* Files that are linked before user code.
++   The %s tells GCC to look for these files in the library directory. */
++#undef STARTFILE_SPEC
++#define STARTFILE_SPEC "crt0.o%s crti.o%s crtbegin.o%s"
++
++/* Files that are linked after user code. */
++#undef ENDFILE_SPEC
++#define ENDFILE_SPEC "crtend.o%s crtn.o%s"
++
++/* Additional predefined macros. */
++#undef TARGET_OS_CPP_BUILTINS
++#define TARGET_OS_CPP_BUILTINS()      \
++  do {                                \
++    builtin_define ("__spctrx__");      \
++    builtin_define ("__unix__");      \
++    builtin_assert ("system=spctrx");   \
++    builtin_assert ("system=unix");   \
++    builtin_assert ("system=posix");   \
++  } while(0);
