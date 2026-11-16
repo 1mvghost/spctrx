@@ -1,6 +1,6 @@
 .PHONY: all createTmpDirs format clean
 
-KERNEL_BUILD?=./
+KERNEL_BUILD?=../kernel.sys
 
 # dirs
 
@@ -92,5 +92,5 @@ format:
 	@find $(SRC) -regex '.*\.\(c\|h\)' ! -name "*limine*" ! -name "*printf*" -exec $(FORMAT) -style=file -i {} \;
 
 clean:
-	rm -rf $(BUILD)
-	rm -rf $(KERNEL_BUILD)
+	@rm -rf $(BUILD)
+	@rm -rf $(KERNEL_BUILD)

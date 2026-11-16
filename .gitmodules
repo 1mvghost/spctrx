@@ -1,5 +1,5 @@
-[submodule "limine"]
-	path = limine
+[submodule "libs/limine"]
+	path = libs/limine
 	url = https://www.github.com/Limine-Bootloader/Limine
 	branch = v11.x-binary
 [submodule "kernel/libs/flanterm"]

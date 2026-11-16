@@ -1,5 +1,8 @@
 #!/bin/bash
 
+PREFIX="$HOME/opt/spctrx-cross"
+TARGET="x86_64-spctrx"
+
 AUTOCONF_VERSION="2.69"
 AUTOCONF_URL="https://ftp.gnu.org/gnu/autoconf"
 AUTOCONF_FILE="autoconf-${AUTOCONF_VERSION}"
@@ -28,14 +31,20 @@ getTarball() {
 	cd ..
 }
 
+
+# https://stackoverflow.com/questions/1885525/how-do-i-prompt-a-user-for-confirmation-in-bash-script
+if [ -d ${PREFIX} ]; then
+	read -p "found an already existing spctrx toolchain, rebuild it? (y/n) > " -n 1 -r
+	echo
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		[[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1
+	fi
+fi
+
 rm -rf ./temp
-rm -rf $HOME/opt/spctrx-cross
+rm -rf ${PREFIX}
 
 mkdir temp
-mkdir -p $HOME/opt/spctrx-cross
-
-export PREFIX="$HOME/opt/spctrx-cross"
-export TARGET="x86_64-spctrx"
 
 getTarball \
 	${BINUTILS_URL} \
@@ -52,6 +61,8 @@ getTarball \
 getTarball \
 	${AUTOCONF_URL} \
 	${AUTOCONF_FILE} \
+
+mkdir -p ${PREFIX}
 
 cd temp
 	cd ${AUTOCONF_FILE}
