@@ -2,6 +2,7 @@
 #include <ahci.h>
 #include <fb.h>
 #include <gdt.h>
+#include <hashmap.h>
 #include <idt.h>
 #include <ioapic.h>
 #include <irq.h>
@@ -119,5 +120,28 @@ void test() {
       slabFree(&testCache, allocated);
     }
   }
+#endif
+#ifdef HASHMAP_TEST
+  HashMap map;
+
+  hashmapInit(&map);
+
+  hashmapPut(&map, "h", "string");
+  hashmapPut(&map, "!", "another string");
+  hashmapPut(&map, "!!", "adadjsjdsaj");
+
+  char* get = hashmapGet(&map, "h");
+  printf("%llx %s\n", get, get);
+
+  get = hashmapGet(&map, "!");
+  printf("%llx %s\n", get, get);
+
+  get = hashmapGet(&map, "!!");
+  printf("%llx %s\n", get, get);
+
+  hashmapPut(&map, "!!", "replaced value");
+
+  get = hashmapGet(&map, "!!");
+  printf("%llx %s\n", get, get);
 #endif
 }
