@@ -2,6 +2,7 @@
 #include <bitmap.h>
 #include <boot.h>
 #include <log.h>
+#include <paging.h>
 #include <panic.h>
 #include <pmm.h>
 #include <spinlock.h>

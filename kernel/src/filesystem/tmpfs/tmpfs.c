@@ -1,4 +1,5 @@
 #include <log.h>
+#include <paging.h>
 #include <slab.h>
 #include <string.h>
 #include <tmpfs.h>

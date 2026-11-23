@@ -1,36 +1,37 @@
-#include <cpu.h>
+#include <arch.h>
 #include <gdt.h>
 #include <idt.h>
+#include <isr.h>
 #include <msr.h>
 #include <panic.h>
+#include <serial.h>
 
-void disableInts() {
+void archDisableInterrupts() {
   asm volatile("cli");
 }
 
-void enableInts() {
+void archEnableInterrupts() {
   asm volatile("sti");
 }
 
-void waitForInterrupt() {
+void archWaitForInterrupt() {
   asm volatile("hlt");
 }
 
-void halt() {
-  disableInts();
+void archHcf() {
+  archDisableInterrupts();
 
   for (;;) {
-    waitForInterrupt();
+    archWaitForInterrupt();
   }
 }
 
-void cpuid(u32* eax, u32* ebx, u32* ecx, u32* edx) {
-  asm volatile("cpuid" : "=b"(*ebx), "=c"(*ecx), "=d"(*edx) : "a"(*eax));
-}
-
-void cpuEarlyInit() {
+void archEarlyInit() {
   gdtInit();
   idtInit();
+  isrInit();
+
+  serialInit();
 
   /**
    * check for msr support
@@ -40,7 +41,7 @@ void cpuEarlyInit() {
   }
 }
 
-void cpuApEarlyInit() {
+void archApEarlyInit() {
   gdtFlush();
   idtFlush();
 }

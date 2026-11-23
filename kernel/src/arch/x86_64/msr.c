@@ -1,4 +1,4 @@
-#include <cpu.h>
+#include <cpuid.h>
 #include <msr.h>
 
 bool msrCheckSupport() {

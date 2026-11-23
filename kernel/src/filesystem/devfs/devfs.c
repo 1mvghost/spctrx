@@ -1,7 +1,6 @@
 #include <devfs.h>
 #include <log.h>
 #include <printf.h>
-#include <serial.h>
 #include <string.h>
 #include <tmpfs.h>
 

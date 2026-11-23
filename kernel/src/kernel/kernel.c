@@ -1,20 +1,15 @@
 #include <acpi.h>
 #include <apic.h>
+#include <arch.h>
 #include <boot.h>
-#include <cpu.h>
 #include <fb.h>
-#include <io.h>
 #include <irq.h>
-#include <isr.h>
 #include <limine.h>
 #include <mp.h>
-#include <panic.h>
 #include <pci.h>
 #include <pmm.h>
 #include <printf.h>
-#include <serial.h>
 #include <term.h>
-#include <test.h>
 #include <util.h>
 #include <vfs.h>
 #include <vmm.h>
@@ -25,22 +20,19 @@ __attribute__((
     LIMINE_BASE_REVISION(4);
 
 void main() {
-  disableInts();
+  archDisableInterrupts();
 
   if (LIMINE_BASE_REVISION_SUPPORTED(limine_base_revision) == 0) {
-    halt();
+    archHcf();
   }
 
-  serialInit();
+  archEarlyInit();
+
   fbInit();
   termInit();
 
   printf("spctrx v0.1 (www.github.com/1mvghost/spctrx)\n");
   printf("64-Bit Long Mode\n\n");
-
-  cpuEarlyInit();
-
-  isrInit();
 
   parseBootInfo();
 
@@ -54,10 +46,9 @@ void main() {
   pciInit();
   mpInit();
 
-  test();
+  archEnableInterrupts();
 
-  keypress();
-  acpiReboot();
-
-  panic("\n");
+  for (;;) {
+    archWaitForInterrupt();
+  }
 }

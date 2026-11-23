@@ -1,4 +1,4 @@
-#include <cpu.h>
+#include <arch.h>
 #include <log.h>
 #include <panic.h>
 #include <printf.h>
@@ -77,11 +77,11 @@ void doPanic(char* err) {
 
   DEBUG("call trace end, everything halted!\n", "");
 
-  halt();
+  archHcf();
 }
 
 void panic(char* fmt, ...) {
-  disableInts();
+  archDisableInterrupts();
 
   va_list va;
   va_start(va, fmt);

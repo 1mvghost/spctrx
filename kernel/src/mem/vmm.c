@@ -1,4 +1,5 @@
 #include <boot.h>
+#include <paging.h>
 #include <pmm.h>
 #include <spinlock.h>
 #include <vmm.h>

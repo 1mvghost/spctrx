@@ -1,5 +1,5 @@
+#include <arch.h>
 #include <boot.h>
-#include <cpu.h>
 #include <lapic.h>
 #include <log.h>
 #include <printf.h>
@@ -14,13 +14,13 @@ __attribute__((
 void mpEntry(struct limine_mp_info* mp) {
   UNUSED(mp);
 
-  disableInts();
+  archDisableInterrupts();
 
-  cpuApEarlyInit();
+  archApEarlyInit();
 
   lapicInit();
 
-  halt();
+  archHcf();
 }
 
 void mpInit() {

@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <log.h>
+#include <paging.h>
 #include <slab.h>
 #include <string.h>
 #include <vmm.h>

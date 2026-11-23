@@ -34,23 +34,23 @@ u32 pciGetConfigAddress(u32 bus, u32 dev, u32 func, u32 offset) {
 }
 
 void pciWrite32(u32 bus, u32 dev, u32 func, u32 offset, u32 value) {
-  out32(CONFIG_ADDRESS, pciGetConfigAddress(bus, dev, func, offset));
-  out32(CONFIG_DATA, value);
+  archOut32(CONFIG_ADDRESS, pciGetConfigAddress(bus, dev, func, offset));
+  archOut32(CONFIG_DATA, value);
 }
 
 void pciWrite16(u32 bus, u32 dev, u32 func, u32 offset, u16 value) {
-  out32(CONFIG_ADDRESS, pciGetConfigAddress(bus, dev, func, offset));
-  out16(CONFIG_DATA, value);
+  archOut32(CONFIG_ADDRESS, pciGetConfigAddress(bus, dev, func, offset));
+  archOut16(CONFIG_DATA, value);
 }
 
 void pciWrite8(u32 bus, u32 dev, u32 func, u32 offset, u8 value) {
-  out32(CONFIG_ADDRESS, pciGetConfigAddress(bus, dev, func, offset));
-  out8(CONFIG_DATA, value);
+  archOut32(CONFIG_ADDRESS, pciGetConfigAddress(bus, dev, func, offset));
+  archOut8(CONFIG_DATA, value);
 }
 
 u32 pciRead32(u32 bus, u32 dev, u32 func, u32 offset) {
-  out32(CONFIG_ADDRESS, pciGetConfigAddress(bus, dev, func, offset));
-  return in32(CONFIG_DATA);
+  archOut32(CONFIG_ADDRESS, pciGetConfigAddress(bus, dev, func, offset));
+  return archIn32(CONFIG_DATA);
 }
 
 u16 pciRead16(u32 bus, u32 dev, u32 func, u32 offset) {

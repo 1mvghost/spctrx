@@ -1,5 +1,6 @@
 #include <ahci.h>
 #include <log.h>
+#include <paging.h>
 #include <pmm.h>
 #include <string.h>
 #include <vmm.h>

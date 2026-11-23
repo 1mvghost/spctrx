@@ -1,5 +1,5 @@
-#ifndef CPU_H
-#define CPU_H
+#ifndef CPUID_H
+#define CPUID_H
 
 #include <util.h>
 
@@ -78,14 +78,6 @@ enum {
 #define CPUID_FEAT_ECX_HYPERVISOR 1ull << 31
 #define CPUID_FEAT_EDX_PBE 1ull << 31
 
-void disableInts();
-void enableInts();
-void waitForInterrupt();
-void halt();
-
 void cpuid(u32* eax, u32* ebx, u32* ecx, u32* edx);
-
-void cpuEarlyInit();
-void cpuApEarlyInit();
 
 #endif

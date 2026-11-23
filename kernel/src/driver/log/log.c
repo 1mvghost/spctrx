@@ -1,5 +1,5 @@
+#include <arch.h>
 #include <printf.h>
-#include <serial.h>
 #include <stdarg.h>
 #include <term.h>
 
@@ -17,6 +17,6 @@ void dprintf(char* prefix, char* fmt, ...) {
 
 /* printf hook */
 void _putchar(char ch) {
-  serialPutc(ch);
+  archDebugPutc(ch);
   termPutc(ch);
 }

@@ -42,8 +42,8 @@ void lapicInit() {
   /**
    * disable the pic
    */
-  out8(PIC1_DATA, 0xff);
-  out8(PIC2_DATA, 0xff);
+  archOut8(PIC1_DATA, 0xff);
+  archOut8(PIC2_DATA, 0xff);
 
   vmmMapMMIO(lapicGetBase(), 1);
 

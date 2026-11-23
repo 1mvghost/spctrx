@@ -1,4 +1,4 @@
-#include <cpu.h>
+#include <cpuid.h>
 #include <ioapic.h>
 #include <lapic.h>
 #include <panic.h>

@@ -1,7 +1,6 @@
 #ifndef VMM_H
 #define VMM_H
 
-#include <paging.h>
 #include <util.h>
 
 void vmmInit();

@@ -1,4 +1,5 @@
 #include <gdt.h>
+#include <util.h>
 
 typedef struct {
   u16 limitLow;
