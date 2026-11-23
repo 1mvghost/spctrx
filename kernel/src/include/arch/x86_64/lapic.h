@@ -1,5 +1,5 @@
-#ifndef LAPIC_H
-#define LAPIC_H
+#ifndef X86_64_LAPIC_H
+#define X86_64_LAPIC_H
 
 #define IA32_APIC_BASE_MSR 0x1B
 #define IA32_APIC_BASE_MSR_BSP 0x100  // Processor is a BSP

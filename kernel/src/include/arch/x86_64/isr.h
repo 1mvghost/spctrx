@@ -1,5 +1,5 @@
-#ifndef ISR_H
-#define ISR_H
+#ifndef X86_64_ISR_H
+#define X86_64_ISR_H
 
 #include <util.h>
 

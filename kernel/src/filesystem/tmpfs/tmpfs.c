@@ -1,5 +1,6 @@
 #include <log.h>
 #include <paging.h>
+#include <pmm.h>
 #include <slab.h>
 #include <string.h>
 #include <tmpfs.h>
@@ -31,7 +32,7 @@ FsNode* tmpfsAllocNode(FsMnt* mnt, char* name, int type) {
   strncpy(tmpfsNode->name, name, sizeof(tmpfsNode->name) - 1);
 
   if (type == TYPE_FILE) {
-    tmpfsNode->data = vmmAlloc(FILE_SIZE_PAGES);
+    tmpfsNode->data = TO_HHDM(pmmAlloc(FILE_SIZE_PAGES));
     memset(tmpfsNode->data, 0, FILE_SIZE_PAGES * PAGE_SIZE);
   }
 

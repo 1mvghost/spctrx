@@ -1,5 +1,5 @@
-#ifndef IOAPIC_H
-#define IOAPIC_H
+#ifndef X86_64_IOAPIC_H
+#define X86_64_IOAPIC_H
 
 #include <ll.h>
 

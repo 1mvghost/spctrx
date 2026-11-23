@@ -3,6 +3,7 @@
 #include <io.h>
 #include <limine.h>
 #include <log.h>
+#include <paging.h>
 #include <panic.h>
 #include <pci.h>
 #include <pmm.h>
@@ -29,16 +30,17 @@ static int SLP_TYPb;
 
 void acpiOut(GenericAddress gAddr, u8 val) {
   if (gAddr.addrSpace == 0) {
-    vmmMapMMIO(gAddr.addr, 1);
+    vmmMap(TO_HHDM(gAddr.addr), gAddr.addr, PAGE_WRITABLE | PAGE_MMIO,
+           PAGE_SIZE);
 
     if (gAddr.accessSize <= 1)
-      *((u8*)vmmPhysToVirt(gAddr.addr)) = val;
+      *((u8*)TO_HHDM(gAddr.addr)) = val;
     if (gAddr.accessSize == 2)
-      *((u16*)vmmPhysToVirt(gAddr.addr)) = val;
+      *((u16*)TO_HHDM(gAddr.addr)) = val;
     if (gAddr.accessSize == 3)
-      *((u32*)vmmPhysToVirt(gAddr.addr)) = val;
+      *((u32*)TO_HHDM(gAddr.addr)) = val;
     if (gAddr.accessSize == 4)
-      *((u64*)vmmPhysToVirt(gAddr.addr)) = val;
+      *((u64*)TO_HHDM(gAddr.addr)) = val;
   }
   if (gAddr.addrSpace == 1) {
     if (gAddr.accessSize <= 1)
@@ -54,9 +56,9 @@ void acpiFadt() {
   if (fadt == 0) {
     return;
   }
-  if (!memcmp(vmmPhysToVirt(fadt->Dsdt), "DSDT", 4)) {
-    SDTHeader* dsdt = (SDTHeader*)vmmPhysToVirt(fadt->Dsdt);
-    char* s5 = (char*)vmmPhysToVirt((fadt->Dsdt + 36));
+  if (!memcmp(TO_HHDM(fadt->Dsdt), "DSDT", 4)) {
+    SDTHeader* dsdt = (SDTHeader*)TO_HHDM(fadt->Dsdt);
+    char* s5 = (char*)TO_HHDM((fadt->Dsdt + 36));
 
     bool found = false;
 
@@ -85,7 +87,7 @@ void acpiFadt() {
 
 void* acpiFindTable(char* signature) {
   for (u32 i = 0; i < (rsdt->h.length - sizeof(rsdt->h)) / 4; i++) {
-    void* a = vmmPhysToVirt(rsdt->sdtPtr[i]);
+    void* a = TO_HHDM(rsdt->sdtPtr[i]);
     SDTHeader* h = (SDTHeader*)a;
     if (!memcmp(h->signature, signature, 4)) {
       return a;
@@ -95,7 +97,7 @@ void* acpiFindTable(char* signature) {
 }
 void acpiRsdt() {
   for (u32 i = 0; i < (rsdt->h.length - sizeof(rsdt->h)) / 4; i++) {
-    void* a = vmmPhysToVirt(rsdt->sdtPtr[i]);
+    void* a = TO_HHDM(rsdt->sdtPtr[i]);
     SDTHeader* h = (SDTHeader*)a;
     DEBUG("FOUND TABLE: %c%c%c%c (%x)\n", h->signature[0], h->signature[1],
           h->signature[2], h->signature[3], a);
@@ -118,7 +120,7 @@ void acpiInit() {
   }
 
   rsdp = (RSDP*)rsdpRequest.response->address;
-  rsdt = (RSDT*)vmmPhysToVirt(rsdp->rsdt);
+  rsdt = (RSDT*)TO_HHDM(rsdp->rsdt);
 
   DEBUG("ACPI OEM: %c%c%c%c%c%c\n", rsdp->oemId[0], rsdp->oemId[1],
         rsdp->oemId[2], rsdp->oemId[3], rsdp->oemId[4], rsdp->oemId[5]);

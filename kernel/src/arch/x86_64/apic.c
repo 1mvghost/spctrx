@@ -1,6 +1,6 @@
-#include <cpuid.h>
-#include <ioapic.h>
-#include <lapic.h>
+#include <arch/x86_64/cpuid.h>
+#include <arch/x86_64/ioapic.h>
+#include <arch/x86_64/lapic.h>
 #include <panic.h>
 #include <util.h>
 

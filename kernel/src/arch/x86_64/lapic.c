@@ -1,7 +1,8 @@
+#include <arch/x86_64/lapic.h>
+#include <arch/x86_64/msr.h>
 #include <io.h>
-#include <lapic.h>
 #include <log.h>
-#include <msr.h>
+#include <paging.h>
 #include <util.h>
 #include <vmm.h>
 
@@ -25,12 +26,12 @@ u64 lapicGetBase() {
 }
 
 void lapicWriteReg(u32 reg, u32 value) {
-  u32 volatile* ptr = (u32 volatile*)vmmPhysToVirt(lapicGetBase() + reg);
+  u32 volatile* ptr = (u32 volatile*)TO_HHDM(lapicGetBase() + reg);
   *ptr = value;
 }
 
 u32 lapicReadReg(u32 reg) {
-  u32 volatile* ptr = (u32 volatile*)vmmPhysToVirt(lapicGetBase() + reg);
+  u32 volatile* ptr = (u32 volatile*)TO_HHDM(lapicGetBase() + reg);
   return *ptr;
 }
 
@@ -45,7 +46,8 @@ void lapicInit() {
   archOut8(PIC1_DATA, 0xff);
   archOut8(PIC2_DATA, 0xff);
 
-  vmmMapMMIO(lapicGetBase(), 1);
+  vmmMap(TO_HHDM(lapicGetBase()), lapicGetBase(), PAGE_WRITABLE | PAGE_MMIO,
+         PAGE_SIZE);
 
   /**
    * enable the lapic

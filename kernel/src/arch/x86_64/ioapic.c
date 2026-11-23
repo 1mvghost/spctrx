@@ -1,8 +1,8 @@
 #include <acpi.h>
-#include <ioapic.h>
+#include <arch/x86_64/ioapic.h>
 #include <log.h>
+#include <paging.h>
 #include <panic.h>
-#include <printf.h>
 #include <slab.h>
 #include <vmm.h>
 
@@ -27,9 +27,9 @@ u32 ioApicReadReg(IOAPIC* ioApic, u32 reg) {
 void ioApicAdd(int id, u64 ioAddr, u32 baseGsi) {
   IOAPIC* ioApic = slabAlloc(&ioApicCache);
 
-  vmmMapMMIO(ioAddr, 1);
+  vmmMap(TO_HHDM(ioAddr), ioAddr, PAGE_WRITABLE | PAGE_MMIO, PAGE_SIZE);
 
-  ioApic->ioAddr = vmmPhysToVirt(ioAddr);
+  ioApic->ioAddr = TO_HHDM(ioAddr);
   ioApic->gsiStart = baseGsi;
 
   int redirEntries = (ioApicReadReg(ioApic, IOAPIC_REGVER) >> 16) + 1;

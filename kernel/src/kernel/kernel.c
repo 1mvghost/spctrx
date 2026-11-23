@@ -1,5 +1,4 @@
 #include <acpi.h>
-#include <apic.h>
 #include <arch.h>
 #include <boot.h>
 #include <fb.h>
@@ -12,7 +11,6 @@
 #include <term.h>
 #include <util.h>
 #include <vfs.h>
-#include <vmm.h>
 
 __attribute__((
     used,
@@ -37,12 +35,10 @@ void main() {
   parseBootInfo();
 
   pmmInit();
-  vmmInit();
-
   irqInit();
   vfsInit();
   acpiInit();
-  apicInit();
+  archInit();
   pciInit();
   mpInit();
 

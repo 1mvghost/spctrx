@@ -1,5 +1,5 @@
-#include <cpuid.h>
-#include <msr.h>
+#include <arch/x86_64/cpuid.h>
+#include <arch/x86_64/msr.h>
 
 bool msrCheckSupport() {
   u32 eax = 1, ebx, ecx, edx;

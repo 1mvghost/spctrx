@@ -1,5 +1,5 @@
+#include <arch/x86_64/serial.h>
 #include <io.h>
-#include <serial.h>
 #include <spinlock.h>
 
 #define COM1 0x3F8

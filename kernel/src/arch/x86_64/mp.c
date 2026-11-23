@@ -1,8 +1,7 @@
 #include <arch.h>
+#include <arch/x86_64/lapic.h>
 #include <boot.h>
-#include <lapic.h>
 #include <log.h>
-#include <printf.h>
 
 #define DEBUG(fmt, ...) dprintf("mp", fmt, __VA_ARGS__)
 

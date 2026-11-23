@@ -1,7 +1,7 @@
-#include <idt.h>
+#include <arch/x86_64/idt.h>
+#include <arch/x86_64/isr.h>
+#include <arch/x86_64/panic.h>
 #include <irq.h>
-#include <isr.h>
-#include <panic.h>
 
 extern u64 isrStub[256];
 

@@ -158,18 +158,18 @@ void ahciRebase(HbaPort* port) {
   ahciCmdStop(port);
 
   /* alloc command list */
-  void* cl = vmmAlloc(1);
+  void* cl = TO_HHDM(pmmAlloc(1));
   memset(cl, 0, PAGE_SIZE);
 
-  u64 clPhys = vmmVirtToPhys(cl);
+  u64 clPhys = FROM_HHDM(cl);
   port->clb = U64_LOW(clPhys);
   port->clbUp = U64_HIGH(clPhys);
 
   /* alloc fis */
-  void* fis = vmmAlloc(1);
+  void* fis = TO_HHDM(pmmAlloc(1));
   memset(fis, 0, PAGE_SIZE);
 
-  u64 fisPhys = vmmVirtToPhys(fis);
+  u64 fisPhys = FROM_HHDM(fis);
   port->fb = U64_LOW(fisPhys);
   port->fbUp = U64_HIGH(fisPhys);
 
@@ -179,10 +179,10 @@ void ahciRebase(HbaPort* port) {
   for (int i = 0; i < 32; i++) {
     cmd[i].prdtLen = 8; /* 8 ENTRIES PER CMD TABLE */
 
-    void* ctba = vmmAlloc(1);
+    void* ctba = TO_HHDM(pmmAlloc(1));
     memset(ctba, 0, PAGE_SIZE);
 
-    u64 ctbaPhys = vmmVirtToPhys(ctba);
+    u64 ctbaPhys = FROM_HHDM(ctba);
     cmd[i].ctbAddr = U64_LOW(ctbaPhys);
     cmd[i].ctbAddrUp = U64_HIGH(ctbaPhys);
   }
@@ -260,7 +260,7 @@ bool ahciReadOrWrite(int p, u64 lba, u32 sectAmount, void* buf, bool write) {
     return false;
   }
 
-  HbaCmdHeader* cmd = (HbaCmdHeader*)vmmPhysToVirt(U64(port->clb, port->clbUp));
+  HbaCmdHeader* cmd = (HbaCmdHeader*)TO_HHDM(U64(port->clb, port->clbUp));
   if (!cmd)
     return false;
 
@@ -268,11 +268,11 @@ bool ahciReadOrWrite(int p, u64 lba, u32 sectAmount, void* buf, bool write) {
   cmd[slot].write = write;
 
   HbaCmdTbl* table =
-      (HbaCmdTbl*)vmmPhysToVirt(U64(cmd[slot].ctbAddr, cmd[slot].ctbAddrUp));
+      (HbaCmdTbl*)TO_HHDM(U64(cmd[slot].ctbAddr, cmd[slot].ctbAddrUp));
   if (!table)
     return false;
 
-  u64 bufPhys = vmmVirtToPhys(buf);
+  u64 bufPhys = FROM_HHDM(buf);
 
   table->ent[0].dbAddr = U64_LOW(bufPhys);
   table->ent[0].dbAddrUp = U64_HIGH(bufPhys);
@@ -336,8 +336,8 @@ void ahciInit(u64 bar5) {
     DEBUG("more than 1 controller is not supported yet\n", "");
     return;
   }
-  vmmMapMMIO(bar5, 1);
+  vmmMap(TO_HHDM(bar5), bar5, PAGE_WRITABLE | PAGE_MMIO, PAGE_SIZE);
 
-  base = (HbaMem*)vmmPhysToVirt(bar5);
+  base = (HbaMem*)TO_HHDM(bar5);
   ahciEnum();
 }

@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <log.h>
 #include <paging.h>
+#include <pmm.h>
 #include <slab.h>
 #include <string.h>
 #include <vmm.h>
@@ -27,7 +28,7 @@ void slabAllocSlab(SlabCache* cache) {
   /**
    * allocate the slab
    */
-  Slab* header = vmmAlloc(1);
+  Slab* header = TO_HHDM(pmmAlloc(1));
   memset(header, 0, PAGE_SIZE);
 
   /*

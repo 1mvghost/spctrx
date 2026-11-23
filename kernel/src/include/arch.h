@@ -9,6 +9,8 @@ void archHcf();
 void archDebugPutc(char ch);
 
 void archEarlyInit();
+void archInit();
+
 void archApEarlyInit();
 
 #endif

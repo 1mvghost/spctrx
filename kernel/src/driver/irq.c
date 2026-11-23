@@ -1,6 +1,7 @@
 #include <bitmap.h>
 #include <irq.h>
 #include <log.h>
+#include <pmm.h>
 #include <vmm.h>
 
 #define DEBUG(fmt, ...) dprintf("irq", fmt, __VA_ARGS__)
@@ -39,7 +40,7 @@ void irqHandleSpurious() {
 }
 
 void irqInit() {
-  bitmapInit(&irqBitmap, IRQ_HANDLERS, vmmAlloc(1));
+  bitmapInit(&irqBitmap, IRQ_HANDLERS, TO_HHDM(pmmAlloc(1)));
 
   irqInstall(255, irqHandleSpurious);
 }

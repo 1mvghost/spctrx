@@ -45,7 +45,7 @@ u64 pmmZeroAlloc(size_t pages) {
   ASSERT(pages > 0);
 
   u64 addr = pmmAlloc(pages);
-  memset(vmmPhysToVirt(addr), 0, pages * PAGE_SIZE);
+  memset(TO_HHDM(addr), 0, pages * PAGE_SIZE);
 
   return addr;
 }
@@ -102,7 +102,7 @@ void pmmInit() {
 
   DEBUG("bitmap addr %llx\n", bitmapAddr);
 
-  bitmapInit(&pmmBitmap, last / PAGE_SIZE, vmmPhysToVirt(bitmapAddr));
+  bitmapInit(&pmmBitmap, last / PAGE_SIZE, TO_HHDM(bitmapAddr));
   bitmapFillAll(&pmmBitmap, true);
 
   /*

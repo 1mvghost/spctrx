@@ -1,5 +1,5 @@
-#ifndef CPUID_H
-#define CPUID_H
+#ifndef X86_64_CPUID_H
+#define X86_64_CPUID_H
 
 #include <util.h>
 

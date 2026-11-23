@@ -1,5 +1,5 @@
-#ifndef IDT_H
-#define IDT_H
+#ifndef X86_64_IDT_H
+#define X86_64_IDT_H
 
 #include <util.h>
 

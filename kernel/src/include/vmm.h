@@ -1,22 +1,18 @@
 #ifndef VMM_H
 #define VMM_H
 
+#include <boot.h>
 #include <util.h>
 
-void vmmInit();
+/**
+ * page flags
+ */
+#define PAGE_WRITABLE 1
+#define PAGE_MMIO 2
 
-void vmmMapPages(void* virt, u64 phys, int flags, int n);
-void vmmUnmapPages(void* virt, int n);
+#define TO_HHDM(phys) (void*)((phys) + getHHDM())
+#define FROM_HHDM(virt) ((u64)(virt) - getHHDM())
 
-void vmmMap(void* virt, u64 phys, int flags);
-void vmmUnmap(void* virt);
-
-u64 vmmVirtToPhys(void* virt);
-void* vmmPhysToVirt(u64 phys);
-
-void vmmMapMMIO(u64 addr, size_t pages);
-void vmmUnmapMMIO(u64 addr, size_t pages);
-
-void* vmmAlloc(size_t pages);
+void vmmMap(void* virt, u64 phys, int flags, size_t length);
 
 #endif

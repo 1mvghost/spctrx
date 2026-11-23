@@ -1,5 +1,5 @@
-#ifndef MSR_H
-#define MSR_H
+#ifndef X86_64_MSR_H
+#define X86_64_MSR_H
 
 #include <util.h>
 

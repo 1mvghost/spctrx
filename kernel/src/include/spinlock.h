@@ -2,7 +2,6 @@
 #define SPINLOCK_H
 
 #include <stdatomic.h>
-#include <util.h>
 
 typedef atomic_flag Spinlock;
 
