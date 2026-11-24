@@ -4,7 +4,7 @@
 #include <ll.h>
 #include <spinlock.h>
 
-#define TABLE_SIZE 256
+#define TABLE_SIZE 32
 
 typedef struct {
   LLHead table[TABLE_SIZE];

@@ -37,8 +37,7 @@ FsNode* tmpfsAllocNode(FsMnt* mnt, char* name, int type) {
   }
 
   tmpfsNode->node = node;
-  llInitHead(&tmpfsNode->children);
-  llInitHead(&tmpfsNode->childHead);
+  hashmapInit(&tmpfsNode->children);
 
   node->fsData = tmpfsNode;
 
@@ -51,7 +50,7 @@ int tmpfsAddChild(FsNode* n, FsNode* child) {
   TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
   TmpfsNode* tmpfsChild = (TmpfsNode*)child->fsData;
 
-  llInsertFront(&tmpfsNode->children, &tmpfsChild->childHead);
+  hashmapPut(&tmpfsNode->children, tmpfsChild->name, child);
 
   return 0;
 }
@@ -85,22 +84,14 @@ int tmpfsWrite(FsNode* n, u64 pos, void* buf, size_t size) {
 }
 
 int tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf) {
-  TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
+  UNUSED(n);
+  UNUSED(pos);
+  UNUSED(buf);
 
-  LLHead* current;
-  LL_TRAVERSE(current, &tmpfsNode->children) {
-    TmpfsNode* child = LIST_ENTRY(current, TmpfsNode, childHead);
+  /**
+   * TODO: implement
+   */
 
-    if (pos == 0) {
-      strcpy(buf->d_name, child->name);
-      buf->d_type = child->node->type;
-      buf->d_reclen = sizeof(struct linux_dirent64) + strlen(buf->d_name) + 1;
-
-      return 0;
-    }
-
-    pos--;
-  }
   return -1;
 }
 
@@ -115,15 +106,7 @@ int tmpfsMkdir(FsNode* n, char* name) {
 FsNode* tmpfsLookup(FsNode* n, char* name) {
   TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
 
-  LLHead* current;
-  LL_TRAVERSE(current, &tmpfsNode->children) {
-    TmpfsNode* child = LIST_ENTRY(current, TmpfsNode, childHead);
-
-    if (!strcmp(child->name, name)) {
-      return child->node;
-    }
-  }
-  return 0;
+  return hashmapGet(&tmpfsNode->children, name);
 }
 
 void tmpfsMount(FsMnt* mnt) {

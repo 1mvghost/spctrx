@@ -1,6 +1,7 @@
 #ifndef TMPFS_H
 #define TMPFS_H
 
+#include <hashmap.h>
 #include <util.h>
 #include <vfs.h>
 
@@ -8,8 +9,7 @@ typedef struct {
   char name[32 + 1];
   FsNode* node;
 
-  LLHead childHead;
-  LLHead children;
+  HashMap children;
 
   u8* data;
 } TmpfsNode;
