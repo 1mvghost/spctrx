@@ -22,5 +22,6 @@ typedef struct {
 void hashmapInit(HashMap* map);
 void hashmapPut(HashMap* map, char* key, void* value);
 void* hashmapGet(HashMap* map, char* key);
+char* hashmapGetItem(HashMap* map, int index);
 
 #endif

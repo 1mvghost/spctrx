@@ -112,3 +112,22 @@ void* hashmapGet(HashMap* map, char* key) {
 
   return 0;
 }
+
+char* hashmapGetItem(HashMap* map, int index) {
+  ASSERT(map != 0);
+
+  for (int i = 0; i < TABLE_SIZE; i++) {
+    LLHead* chain = &map->table[i];
+    LLHead* current;
+
+    LL_TRAVERSE(current, chain) {
+      if (index == 0) {
+        HashMapNode* node = LIST_ENTRY(current, HashMapNode, head);
+        return node->key;
+      }
+      index--;
+    }
+  }
+
+  return 0;
+}

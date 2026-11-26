@@ -42,6 +42,8 @@ void main() {
   pciInit();
   mpInit();
 
+  vfsTreeIterate(vfsLookup("/"), 0);
+
   archEnableInterrupts();
 
   for (;;) {

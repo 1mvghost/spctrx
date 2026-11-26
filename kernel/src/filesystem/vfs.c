@@ -1,6 +1,7 @@
 #include <devfs.h>
 #include <ll.h>
 #include <log.h>
+#include <printf.h>
 #include <slab.h>
 #include <string.h>
 #include <tmpfs.h>
@@ -157,6 +158,31 @@ void vfsDoMounts() {
   vfsMkdir("/", "dev");
 
   vfsMount("/dev", "", "dev");
+}
+
+/**
+ * testing function
+ */
+void vfsTreeIterate(FsNode* current, int depth) {
+  if (current == 0) {
+    return;
+  }
+
+  char buffer[256];
+  struct linux_dirent64* dirent = (struct linux_dirent64*)&buffer;
+
+  u64 pos = 0;
+  while (current->ops->readdir(current, pos, dirent) == 0) {
+    for (int i = 0; i < depth; i++) {
+      printf(" ");
+    }
+    printf("> %s\n", dirent->d_name);
+
+    if (dirent->d_type == TYPE_DIR) {
+      vfsTreeIterate(vfsLook(current, dirent->d_name), depth + 1);
+    }
+    pos++;
+  }
 }
 
 void vfsInit() {

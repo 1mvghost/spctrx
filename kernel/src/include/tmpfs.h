@@ -6,15 +6,12 @@
 #include <vfs.h>
 
 typedef struct {
-  char name[32 + 1];
-  FsNode* node;
-
   HashMap children;
 
   u8* data;
 } TmpfsNode;
 
-FsNode* tmpfsAllocNode(FsMnt* mnt, char* name, int type);
+FsNode* tmpfsAllocNode(FsMnt* mnt, int type);
 
 int tmpfsRead(FsNode* n, u64 pos, void* buf, size_t size);
 int tmpfsWrite(FsNode* n, u64 pos, void* buf, size_t size);

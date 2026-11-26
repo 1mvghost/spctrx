@@ -59,6 +59,7 @@ FsNode* vfsLookup(char* path);
 
 bool vfsMount(char* path, char* dev, char* type);
 
+void vfsTreeIterate(FsNode* current, int depth);
 void vfsInit();
 
 #endif

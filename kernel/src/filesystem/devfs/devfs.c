@@ -51,13 +51,13 @@ void devfsCreateDev(FsMnt* mnt, char* name) {
   FsNode* node = tmpfsLookup(mnt->root, name);
   node->ops = &devfsHandler;
 
-  if (tmpfsWrite(node, 0, name, sizeof(name)) < 0) {
+  if (tmpfsWrite(node, 0, name, strlen(name)) < 0) {
     DEBUG("tmpfs bug, write to created node failed!\n", "");
   }
 }
 
 void devfsMount(FsMnt* mnt) {
-  mnt->root = tmpfsAllocNode(mnt, "", TYPE_DIR);
+  mnt->root = tmpfsAllocNode(mnt, TYPE_DIR);
   mnt->root->ops = &devfsHandler;
 
   devfsCreateDev(mnt, "tty");
