@@ -11,6 +11,7 @@
 #include <term.h>
 #include <util.h>
 #include <vfs.h>
+#include <vfsops.h>
 
 __attribute__((
     used,
@@ -43,6 +44,7 @@ void main() {
   mpInit();
 
   vfsTreeIterate(vfsLookup("/"), 0);
+  vfsWrite("/dev/tty", 0, "Hello world", 12);
 
   archEnableInterrupts();
 

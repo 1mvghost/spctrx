@@ -25,18 +25,18 @@ int vfsReadDir(char* path, u64 pos, struct linux_dirent64* buf) {
   return 0;
 }
 
-int vfsCreate(char* path, char* name) {
+int vfsCreate(char* path, char* name, FsNode** out) {
   FsNode* node = vfsLookup(path);
   if (node && node->ops->create) {
-    return node->ops->create(node, name);
+    return node->ops->create(node, name, out);
   }
   return 0;
 }
 
-int vfsMkdir(char* path, char* name) {
+int vfsMkdir(char* path, char* name, FsNode** out) {
   FsNode* node = vfsLookup(path);
   if (node && node->ops->mkdir) {
-    return node->ops->mkdir(node, name);
+    return node->ops->mkdir(node, name, out);
   }
   return 0;
 }

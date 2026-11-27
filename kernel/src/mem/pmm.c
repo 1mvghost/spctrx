@@ -41,15 +41,6 @@ u64 pmmAlloc(size_t pages) {
   return found * PAGE_SIZE;
 }
 
-u64 pmmZeroAlloc(size_t pages) {
-  ASSERT(pages > 0);
-
-  u64 addr = pmmAlloc(pages);
-  memset(TO_HHDM(addr), 0, pages * PAGE_SIZE);
-
-  return addr;
-}
-
 void pmmFree(u64 addr, size_t pages) {
   ASSERT(addr != 0);
   ASSERT(pages > 0);

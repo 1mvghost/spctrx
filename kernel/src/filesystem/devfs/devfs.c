@@ -43,12 +43,12 @@ int devfsWrite(FsNode* n, u64 pos, void* buf, size_t size) {
 }
 
 void devfsCreateDev(FsMnt* mnt, char* name) {
-  if (tmpfsCreate(mnt->root, name) < 0) {
+  FsNode* node;
+  if (tmpfsCreate(mnt->root, name, &node) < 0) {
     DEBUG("tmpfs bug, node creation failed!\n", "");
     return;
   }
 
-  FsNode* node = tmpfsLookup(mnt->root, name);
   node->ops = &devfsHandler;
 
   if (tmpfsWrite(node, 0, name, strlen(name)) < 0) {

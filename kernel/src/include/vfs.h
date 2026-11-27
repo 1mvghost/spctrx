@@ -14,6 +14,8 @@ typedef struct {
   struct _FsHandler* ops;
 
   LLHead head;
+
+  size_t size;
 } FsNode;
 
 typedef struct _FsMnt {
@@ -46,8 +48,8 @@ typedef struct _FsHandler {
   int (*open)(FsNode* n, u64 flags);
   int (*read)(FsNode* n, u64 pos, void* buf, size_t size);
   int (*write)(FsNode* n, u64 pos, void* buf, size_t size);
-  int (*create)(FsNode* n, char* name);
-  int (*mkdir)(FsNode* n, char* name);
+  int (*create)(FsNode* n, char* name, FsNode** out);
+  int (*mkdir)(FsNode* n, char* name, FsNode** out);
   int (*readdir)(FsNode* n, u64 pos, struct linux_dirent64* buf);
 
   FsNode* (*lookup)(FsNode* n, char* name);

@@ -155,7 +155,7 @@ bool vfsMount(char* path, char* dev, char* type) {
 void vfsDoMounts() {
   vfsMount("/", "", "tmp");
 
-  vfsMkdir("/", "dev");
+  vfsMkdir("/", "dev", 0);
 
   vfsMount("/dev", "", "dev");
 }

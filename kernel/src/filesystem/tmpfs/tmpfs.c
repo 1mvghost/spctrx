@@ -30,12 +30,9 @@ FsNode* tmpfsAllocNode(FsMnt* mnt, int type) {
 
   TmpfsNode* tmpfsNode = slabAlloc(&tmpfsNodeCache);
 
-  if (type == TYPE_FILE) {
-    tmpfsNode->data = TO_HHDM(pmmAlloc(FILE_SIZE_PAGES));
-    memset(tmpfsNode->data, 0, FILE_SIZE_PAGES * PAGE_SIZE);
+  if (type == TYPE_DIR) {
+    hashmapInit(&tmpfsNode->children);
   }
-
-  hashmapInit(&tmpfsNode->children);
 
   node->fsData = tmpfsNode;
 
@@ -45,6 +42,10 @@ FsNode* tmpfsAllocNode(FsMnt* mnt, int type) {
 }
 
 int tmpfsAddChild(FsNode* n, FsNode* child, char* name) {
+  if (n->type != TYPE_DIR) {
+    return -1;
+  }
+
   TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
 
   hashmapPut(&tmpfsNode->children, name, child);
@@ -62,6 +63,13 @@ int tmpfsReadWrite(FsNode* n, u64 pos, void* buf, size_t size, bool write) {
   }
 
   TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
+
+  if (tmpfsNode->data == 0) {
+    tmpfsNode->data = TO_HHDM(pmmAlloc(FILE_SIZE_PAGES));
+    n->size = FILE_SIZE_PAGES * PAGE_SIZE;
+
+    memset(tmpfsNode->data, 0, n->size);
+  }
 
   if (write) {
     memcpy(tmpfsNode->data + pos, buf, size);
@@ -83,6 +91,10 @@ int tmpfsWrite(FsNode* n, u64 pos, void* buf, size_t size) {
 int tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf) {
   ASSERT(buf != 0);
 
+  if (n->type != TYPE_DIR) {
+    return -1;
+  }
+
   TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
 
   char* name = hashmapGetItem(&tmpfsNode->children, pos);
@@ -101,15 +113,35 @@ int tmpfsReaddir(FsNode* n, u64 pos, struct linux_dirent64* buf) {
   return 0;
 }
 
-int tmpfsCreate(FsNode* n, char* name) {
-  return tmpfsAddChild(n, tmpfsAllocNode(n->mnt, TYPE_FILE), name);
+int tmpfsCreate(FsNode* n, char* name, FsNode** out) {
+  if (n->type != TYPE_DIR) {
+    return -1;
+  }
+
+  FsNode* node = tmpfsAllocNode(n->mnt, TYPE_FILE);
+  if (out != 0) {
+    *out = node;
+  }
+  return tmpfsAddChild(n, node, name);
 }
 
-int tmpfsMkdir(FsNode* n, char* name) {
-  return tmpfsAddChild(n, tmpfsAllocNode(n->mnt, TYPE_DIR), name);
+int tmpfsMkdir(FsNode* n, char* name, FsNode** out) {
+  if (n->type != TYPE_DIR) {
+    return -1;
+  }
+
+  FsNode* node = tmpfsAllocNode(n->mnt, TYPE_DIR);
+  if (out != 0) {
+    *out = node;
+  }
+  return tmpfsAddChild(n, node, name);
 }
 
 FsNode* tmpfsLookup(FsNode* n, char* name) {
+  if (n->type != TYPE_DIR) {
+    return 0;
+  }
+
   TmpfsNode* tmpfsNode = (TmpfsNode*)n->fsData;
 
   return hashmapGet(&tmpfsNode->children, name);

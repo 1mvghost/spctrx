@@ -1,6 +1,8 @@
 #include <arch/x86_64/paging.h>
+#include <paging.h>
 #include <pmm.h>
 #include <spinlock.h>
+#include <string.h>
 #include <vmm.h>
 
 static PageTable p4;
@@ -37,17 +39,26 @@ PageTable pagingWalk(void* virt, bool allocate, int allocFlags) {
   int p2Idx = P2(virt);
 
   if (allocate && p4[p4Idx] == 0) {
-    p4[p4Idx] = PTE(pmmZeroAlloc(1), allocFlags);
+    u64 pt = pmmAlloc(1);
+    memset(TO_HHDM(pt), 0, PAGE_SIZE);
+
+    p4[p4Idx] = PTE(pt, allocFlags);
   }
   PageTable p3 = pagingGetPageTable(p4[p4Idx]);
 
   if (allocate && p3[p3Idx] == 0) {
-    p3[p3Idx] = PTE(pmmZeroAlloc(1), allocFlags);
+    u64 pt = pmmAlloc(1);
+    memset(TO_HHDM(pt), 0, PAGE_SIZE);
+
+    p3[p3Idx] = PTE(pt, allocFlags);
   }
   PageTable p2 = pagingGetPageTable(p3[p3Idx]);
 
   if (allocate && p2[p2Idx] == 0) {
-    p2[p2Idx] = PTE(pmmZeroAlloc(1), allocFlags);
+    u64 pt = pmmAlloc(1);
+    memset(TO_HHDM(pt), 0, PAGE_SIZE);
+
+    p2[p2Idx] = PTE(pt, allocFlags);
   }
   PageTable p1 = pagingGetPageTable(p2[p2Idx]);
 
